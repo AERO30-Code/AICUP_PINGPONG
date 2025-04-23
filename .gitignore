@@ -1,0 +1,48 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# VSCode
+.vscode/
+
+# Logs and outputs
+*.log
+*.csv
+*.zip
+*.txt
+
+# Model and feature outputs
+Feature/output/
+Feature/figures/
+Model/output/
+Model/analysis/analysis_output/
+EDA/figures/
+EDA/report/
+catboost_info/
+Test/output/
+
+# Downloaded datasets
+# DownloadDataset/
+# original/
+# upload/
+
+# Boss subfolder data (if temporary)
+# boss/v2_sep/data/
+
+# Ignore system files
+Thumbs.db
+ehthumbs.db
