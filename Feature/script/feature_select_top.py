@@ -1,16 +1,16 @@
 import pandas as pd
 
-N_TOP_FEATURES = 50
+N_TOP_FEATURES = 100
 FEATURE_IMPORTANCE_CSV = 'Model/analysis/analysis_output/feature_meanrank_top800.csv'
-FEATURES_INPUT_CSV = 'Feature/output/features_train.csv'
-OUTPUT_CSV = f'Feature/output/features_train_gender_top/features_train_top{N_TOP_FEATURES}.csv'
+FEATURES_INPUT_CSV = 'Feature/output/features_test.csv'
+OUTPUT_CSV = f'Feature/output/features_train_gender_top/features_test_top{N_TOP_FEATURES}.csv'
 
-META_COLS = [
-    'unique_id', 'mode', 'gender', 'hold racket handed', 'play years', 'level'
-]
 # META_COLS = [
-#     'unique_id', 'mode'
+#     'unique_id', 'mode', 'gender', 'hold racket handed', 'play years', 'level'
 # ]
+META_COLS = [
+    'unique_id', 'mode'
+]
 importance_df = pd.read_csv(FEATURE_IMPORTANCE_CSV)
 selected_features = importance_df.sort_values('mean_rank')['feature'].head(N_TOP_FEATURES).tolist()
 

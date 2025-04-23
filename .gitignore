@@ -21,19 +21,19 @@ ENV/
 
 # Logs and outputs
 *.log
-*.csv
+# *.csv
 *.zip
-*.txt
+# *.txt
 
 # Model and feature outputs
-Feature/output/
-Feature/figures/
-Model/output/
-Model/analysis/analysis_output/
+# Feature/output/
+# Feature/figures/
+# Model/output/
+# Model/analysis/analysis_output/
 EDA/figures/
 EDA/report/
 catboost_info/
-Test/output/
+# Test/output/
 
 # Downloaded datasets
 # DownloadDataset/

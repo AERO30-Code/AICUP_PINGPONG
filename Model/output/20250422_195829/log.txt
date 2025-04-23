@@ -1,0 +1,8 @@
+Training time: 2025-04-22 19:58:29
+Feature path: Feature/output/features_train_Az_median.csv
+Feature scaling: minmax
+Trained targets: gender
+
+Model: logisticregression_gender
+Parameters: {'C': 1.0, 'penalty': 'l2', 'solver': 'lbfgs', 'max_iter': 1000, 'random_state': 42}
+Validation ROC AUC for logisticregression_gender: 0.7521

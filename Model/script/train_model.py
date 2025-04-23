@@ -14,7 +14,7 @@ from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.linear_model import LogisticRegression
 import datetime
 CONFIG_PATH = "Model/config/model_config.yaml"
-FEATURE_PATH = "Feature/output/features_train_gender_top/features_train_top50.csv"
+FEATURE_PATH = "Feature/output/features_train_gender_top/features_train_top100.csv"
 MODEL_DIR = "Model/output/"
 
 # 目標與型態設定
@@ -100,10 +100,34 @@ def main():
         if mode == "multiclass":
             y = y - y.min()
             
-        # train/val split
-        X_train, X_val, y_train, y_val = train_test_split(
-            X, y, test_size=0.2, random_state=42, stratify=y
+        # 讀取 train_info.csv 並 merge 取得 player_id 與 stratify 欄位
+        info_df = pd.read_csv('original/train/train_info.csv')
+        # 根據目前目標，動態選擇 stratify 欄位
+        stratify_col = TARGET_COLS[target]
+        player_df = info_df[['player_id', stratify_col]].drop_duplicates()
+        # 以 player_id 為單位做 stratified split
+        from sklearn.model_selection import train_test_split as sk_train_test_split
+        player_train, player_val = sk_train_test_split(
+            player_df, test_size=0.2, random_state=42, stratify=player_df[stratify_col]
         )
+        # 取得各自的 player_id set
+        train_player_ids = set(player_train['player_id'])
+        val_player_ids = set(player_val['player_id'])
+        # 將 feature df merge 上 player_id
+        df_merged = df.merge(info_df[['unique_id', 'player_id']], on='unique_id', how='left')
+        train_idx = df_merged[df_merged['player_id'].isin(train_player_ids)].index
+        val_idx = df_merged[df_merged['player_id'].isin(val_player_ids)].index
+        # 產生 X_train, X_val, y_train, y_val
+        X_train = X.loc[train_idx].reset_index(drop=True)
+        X_val = X.loc[val_idx].reset_index(drop=True)
+        y_train = y.loc[train_idx].reset_index(drop=True)
+        y_val = y.loc[val_idx].reset_index(drop=True)
+        # 後續不能有 player_id
+        if 'player_id' in X_train.columns:
+            X_train = X_train.drop(columns=['player_id'])
+        if 'player_id' in X_val.columns:
+            X_val = X_val.drop(columns=['player_id'])
+
 
         model_name = config[target]["model"]
 

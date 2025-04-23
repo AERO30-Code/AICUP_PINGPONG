@@ -1,0 +1,6 @@
+Training time: 2025-04-21 22:18:45
+Trained targets: gender
+
+Model: xgboost_gender
+Parameters: {'n_estimators': 100, 'max_depth': 6, 'learning_rate': 0.1, 'subsample': 0.8}
+Validation ROC AUC for xgboost_gender: 0.9780

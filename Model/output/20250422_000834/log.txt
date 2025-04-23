@@ -1,0 +1,7 @@
+Training time: 2025-04-22 00:08:34
+Feature path: Feature/output/features_train_mean_median_std.csv
+Trained targets: gender
+
+Model: RandomForest_gender
+Parameters: {'n_estimators': 200, 'max_depth': 8, 'random_state': 42}
+Validation ROC AUC for RandomForest_gender: 0.9411
