@@ -16,7 +16,7 @@ FEATURE_SCRIPT_BAK = FEATURE_SCRIPT + '.bak'
 MODEL_SCRIPT_BAK = MODEL_SCRIPT + '.bak'
 
 # 參數範圍
-N_TOP_FEATURES_LIST = list(range(60, 651, 10))
+N_TOP_FEATURES_LIST = list(range(60, 751, 10))
 
 # 結果儲存
 RESULT_CSV = os.path.join(TEST_OUTPUT_DIR, 'feature_auc_result.csv')
@@ -50,7 +50,7 @@ if __name__ == '__main__':
                 print(f"feature_select_top.py 執行失敗\n{result.stderr}")
                 raise RuntimeError('feature_select_top.py failed')
             # 3. 修改 train_model.py 的 FEATURE_PATH
-            feature_csv_path = f"Feature/output/features_train_gender_top/features_train_top{n}.csv"
+            feature_csv_path = f"Feature/output/features_train_gender_top_Test/features_train_top{n}.csv"
             with open(MODEL_SCRIPT_BAK, 'r', encoding='utf-8') as f:
                 model_lines = f.readlines()
             with open(MODEL_SCRIPT, 'w', encoding='utf-8') as f:

@@ -1,7 +1,0 @@
-Training time: 2025-04-22 12:05:42
-Feature path: Feature/output/features_train_Az_median_zscore.csv
-Trained targets: gender
-
-Model: svm_gender
-Parameters: {'kernel': 'rbf', 'C': 1.0, 'gamma': 'scale', 'probability': True, 'random_state': 42}
-Validation ROC AUC for svm_gender: 0.6605

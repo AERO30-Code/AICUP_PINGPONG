@@ -1,0 +1,8 @@
+Training time: 2025-04-24 16:47:07
+Feature path: Feature/output/features_train_gender_top_Test/features_train_top450.csv
+Feature scaling: zscore
+Trained targets: gender
+
+Model: svm_gender
+Parameters: {'kernel': 'rbf', 'C': 1.0, 'gamma': 'scale', 'probability': True, 'random_state': 42}
+Validation ROC AUC for svm_gender: 0.5866

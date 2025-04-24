@@ -1,7 +1,0 @@
-Training time: 2025-04-22 01:22:35
-Feature path: Feature/output/features_train.csv
-Trained targets: gender
-
-Model: catboost_gender
-Parameters: {'iterations': 200, 'depth': 8, 'learning_rate': 0.1, 'random_seed': 42, 'verbose': False, 'thread_count': -1}
-Validation ROC AUC for catboost_gender: 0.9795

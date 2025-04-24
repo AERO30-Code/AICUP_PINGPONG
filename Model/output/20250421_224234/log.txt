@@ -1,6 +1,0 @@
-Training time: 2025-04-21 22:42:34
-Trained targets: gender
-
-Model: RandomForest_gender
-Parameters: {'n_estimators': 200, 'max_depth': 8, 'random_state': 42}
-Validation ROC AUC for RandomForest_gender: 0.9463

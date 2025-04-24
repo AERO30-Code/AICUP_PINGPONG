@@ -1,8 +1,0 @@
-Training time: 2025-04-22 19:26:56
-Feature path: Feature/output/features_train.csv
-Feature scaling: minmax
-Trained targets: gender
-
-Model: svm_gender
-Parameters: {'kernel': 'rbf', 'C': 1.0, 'gamma': 'scale', 'probability': True, 'random_state': 42}
-Validation ROC AUC for svm_gender: 0.9501

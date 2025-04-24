@@ -13,8 +13,8 @@ SUMMARY_COLS = [
 SUFFIX_LIST = ["median"]
 SENSORS = ["Az"]
 
-INPUT_PATH = "Feature/output/features_train.csv"
-OUTPUT_PATH = "Feature/output/features_train_Az_median.csv"
+INPUT_PATH = "Feature/output/features_test.csv"
+OUTPUT_PATH = "Feature/output/features_test_Az_median.csv"
 
 def main():
     df = pd.read_csv(INPUT_PATH)

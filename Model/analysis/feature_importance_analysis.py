@@ -52,7 +52,7 @@ plt.barh(mean_rank_plot['feature'][::-1], mean_rank_plot['mean_rank'][::-1], col
 plt.title(f'Top {TOP_N} Features by Mean Rank (Lower = More Important)')
 plt.xlabel('Mean Rank')
 plt.tight_layout()
-plt.savefig(os.path.join(output_dir, f'feature_meanrank_top{TOP_N}.png'))
+# plt.savefig(os.path.join(output_dir, f'feature_meanrank_top{TOP_N}.png'))
 plt.close()
 
 print('Analysis complete. Results saved to analysis directory.')
