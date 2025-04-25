@@ -4,10 +4,10 @@ import matplotlib.pyplot as plt
 
 # ===== User-customizable parameters =====
 model_csv_paths = [
-    'Model/output/20250424_150853/xgboost_gender_feature_importance.csv',
-    'Model/output/20250424_150937/RandomForest_gender_feature_importance.csv',
-    'Model/output/20250424_151014/lightgbm_gender_feature_importance.csv',
-    'Model/output/20250424_151057/catboost_gender_feature_importance.csv',
+    'Model/output/20250425_153905/xgboost_gender_feature_importance.csv',
+    'Model/output/20250425_153922/RandomForest_gender_feature_importance.csv',
+    'Model/output/20250425_153939/lightgbm_gender_feature_importance.csv',
+    'Model/output/20250425_154001/catboost_gender_feature_importance.csv',
 ]
 output_dir = 'Model/analysis/analysis_output'
 TOP_N = 800
@@ -51,10 +51,10 @@ merged_rank = merged_rank.sort_values('mean_rank')
 
 # Output top TOP_N features
 mean_rank_top = merged_rank.head(TOP_N)
-mean_rank_top.to_csv(os.path.join(output_dir, f'feature_meanrank_4models_top{TOP_N}.csv'), index=False)
+mean_rank_top.to_csv(os.path.join(output_dir, f'train_noplayerid_swing5to27_meanrank_4models_top{TOP_N}.csv'), index=False)
 
 # ===== Plotting: Line plot for all 800 features =====
-plot_csv_path = os.path.join(output_dir, f'feature_meanrank_4models_top{TOP_N}.csv')
+plot_csv_path = os.path.join(output_dir, f'train_noplayerid_swing5to27_meanrank_4models_top{TOP_N}.csv')
 plot_df = pd.read_csv(plot_csv_path)
 
 plt.figure(figsize=(32, 8))
@@ -73,5 +73,5 @@ plt.legend()
 step = 40
 plt.xticks(ticks=range(0, len(plot_df['feature']), step), labels=plot_df['feature'][::step], rotation=60, fontsize=8)
 plt.tight_layout()
-plt.savefig(os.path.join(output_dir, f'feature_meanrank_4models_top{TOP_N}_lineplot.png'))
+plt.savefig(os.path.join(output_dir, f'train_noplayerid_swing5to27_meanrank_4models_top{TOP_N}_lineplot.png'))
 plt.close()

@@ -50,7 +50,7 @@ if __name__ == '__main__':
                 print(f"feature_select_top.py 執行失敗\n{result.stderr}")
                 raise RuntimeError('feature_select_top.py failed')
             # 3. 修改 train_model.py 的 FEATURE_PATH
-            feature_csv_path = f"Feature/output/features_train_gender_top_Test/features_train_top{n}.csv"
+            feature_csv_path = f"Feature/output/features_gender_top_Test/train_noplayerid_swing5to27_4models_top{n}.csv"
             with open(MODEL_SCRIPT_BAK, 'r', encoding='utf-8') as f:
                 model_lines = f.readlines()
             with open(MODEL_SCRIPT, 'w', encoding='utf-8') as f:
