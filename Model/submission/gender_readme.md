@@ -208,29 +208,29 @@ scaling: zscore
 Parameters: {'kernel': 'rbf', 'C': 1.0, 'gamma': 'scale', 'probability': True, 'random_state': 42}
 leaderboard: 0.60552966
 ====================
-path: 
+path: Model/output/20250425_170409
 target: gender
-model: 
-Feature path: 
-scaling: 
-Parameters: 
-leaderboard: 
+model: svm_gender
+Feature path: Feature/output/features_gender_top/train_noplayerid_swing5to27_4models_top500.csv
+scaling: zscore
+Parameters: {'C': 0.01, 'gamma': 'scale', 'kernel': 'rbf', 'probability': True, 'random_state': 42}
+leaderboard: 0.61107119
 
-path: 
+path: Model/output/20250425_171527
 target: gender
-model: 
-Feature path: 
-scaling: 
-Parameters: 
-leaderboard: 
+model: svm_gender
+Feature path: Feature/output/features_gender_top/train_noplayerid_swing5to27_4models_top500.csv
+scaling: zscore
+Parameters: {'C': 0.003162, 'gamma': 0.000316, 'kernel': 'rbf', 'probability': True, 'random_state': 42}
+leaderboard: 0.59220686
 
-path: 
+path: Model/output/20250425_172552
 target: gender
-model: 
-Feature path: 
-scaling: 
-Parameters: 
-leaderboard: 
+model: svm_gender
+Feature path: Feature/output/features_gender_top/train_noplayerid_swing5to27_4models_top500.csv
+scaling: zscore
+Parameters: {'C': 0.003162, 'gamma': 0.000316, 'kernel': 'rbf', 'probability': True, 'random_state': 42}
+leaderboard: 0.59220686
 
 path: 
 target: gender

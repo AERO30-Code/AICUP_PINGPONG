@@ -1,18 +1,18 @@
-feature_scaling: zscore # "zscore" or "minmax" or "none"
+feature_scaling: none # "zscore" or "minmax" or "none"
 
 train_targets:
-  - gender
+  # - gender
   # - hold_racket_handed
   # - play_years
-  # - level
+  - level
 
 gender:
   model: svm
   params:
-    kernel: rbf        
-    C: 1.0          
-    gamma: scale        
-    probability: true 
+    C: 1.0
+    gamma: scale
+    kernel: rbf
+    probability: True
     random_state: 42
 
 hold_racket_handed:
@@ -32,12 +32,11 @@ play_years:
     subsample: 0.8
 
 level:
-  model: xgboost
+  model: RandomForest
   params:
-    n_estimators: 100
-    max_depth: 6
-    learning_rate: 0.1
-    subsample: 0.8
+    n_estimators: 200
+    max_depth: 8
+    random_state: 42
 
 #   model: RandomForest
 #   params:

@@ -14,7 +14,7 @@ from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.linear_model import LogisticRegression
 import datetime
 CONFIG_PATH = "Model/config/model_config.yaml"
-FEATURE_PATH = "Feature/output/features_gender_top/train_noplayerid_swing5to27_4models_top100.csv"
+FEATURE_PATH = "Feature/katsu/train_noplayerid_swing5to27.csv"
 MODEL_DIR = "Model/output/"
 
 # 目標與型態設定
