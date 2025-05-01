@@ -231,11 +231,19 @@ Feature path: Feature/output/features_gender_top/train_noplayerid_swing5to27_4mo
 scaling: zscore
 Parameters: {'C': 0.003162, 'gamma': 0.000316, 'kernel': 'rbf', 'probability': True, 'random_state': 42}
 leaderboard: 0.59220686
-
-path: 
+====================
+path: Model/output/20250501_180031
 target: gender
-model: 
-Feature path: 
-scaling: 
-Parameters: 
-leaderboard: 
+model: svm_gender
+Feature path: Feature/katsu/train_v2.csv
+scaling: zscore
+Parameters: {'C': 0.01, 'gamma': 'scale', 'kernel': 'rbf', 'probability': True, 'random_state': 42}
+leaderboard: 0.59722361
+
+path: Model/output/20250501_180625
+target: gender
+model: svm_gender
+Feature path: Feature/katsu/train_v3.csv
+scaling: zscore
+Parameters: {'C': 0.01, 'gamma': 'scale', 'kernel': 'rbf', 'probability': True, 'random_state': 42}
+leaderboard: 0.60783499

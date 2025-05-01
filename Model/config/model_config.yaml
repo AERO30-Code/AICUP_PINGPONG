@@ -1,15 +1,15 @@
-feature_scaling: none # "zscore" or "minmax" or "none"
+feature_scaling: zscore # "zscore" or "minmax" or "none"
 
 train_targets:
-  # - gender
+  - gender
   # - hold_racket_handed
   # - play_years
-  - level
+  # - level
 
 gender:
   model: svm
   params:
-    C: 1.0
+    C: 0.01
     gamma: scale
     kernel: rbf
     probability: True

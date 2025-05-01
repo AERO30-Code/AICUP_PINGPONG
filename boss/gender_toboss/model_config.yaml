@@ -1,0 +1,87 @@
+feature_scaling: none # "zscore" or "minmax" or "none"
+
+train_targets:
+  # - gender
+  # - hold_racket_handed
+  # - play_years
+  - level
+
+gender:
+  model: svm
+  params:
+    C: 1.0
+    gamma: scale
+    kernel: rbf
+    probability: True
+    random_state: 42
+
+hold_racket_handed:
+  model: xgboost
+  params:
+    n_estimators: 100
+    max_depth: 6
+    learning_rate: 0.1
+    subsample: 0.8
+
+play_years:
+  model: xgboost
+  params:
+    n_estimators: 100
+    max_depth: 6
+    learning_rate: 0.1
+    subsample: 0.8
+
+level:
+  model: RandomForest
+  params:
+    n_estimators: 200
+    max_depth: 8
+    random_state: 42
+
+#   model: RandomForest
+#   params:
+#     n_estimators: 200
+#     max_depth: 8
+#     random_state: 42
+
+#   model: xgboost
+#   params:
+#     n_estimators: 100
+#     max_depth: 6
+#     learning_rate: 0.1
+#     subsample: 0.8
+
+  # model: svm
+  # params:
+  #   kernel: rbf        
+  #   C: 1.0          
+  #   gamma: scale        
+  #   probability: true 
+  #   random_state: 42
+
+  # model: lightgbm
+  # params:
+  #   n_estimators: 200
+  #   max_depth: 8
+  #   learning_rate: 0.1
+  #   subsample: 0.8
+  #   colsample_bytree: 0.8
+  #   random_state: 42
+  #   n_jobs: -1
+
+  # model: catboost
+  # params:
+  #   iterations: 200         
+  #   depth: 8                
+  #   learning_rate: 0.1      
+  #   random_seed: 42         
+  #   verbose: False          
+  #   thread_count: -1 
+
+  # model: logisticregression
+  # params:
+  #   C: 1.0
+  #   penalty: l2
+  #   solver: lbfgs
+  #   max_iter: 1000
+  #   random_state: 42
