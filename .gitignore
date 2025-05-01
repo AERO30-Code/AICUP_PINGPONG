@@ -30,8 +30,8 @@ ENV/
 # Feature/figures/
 # Model/output/
 # Model/analysis/analysis_output/
-EDA/figures/
-EDA/report/
+# EDA/figures/
+# EDA/report/
 catboost_info/
 # Test/output/
 

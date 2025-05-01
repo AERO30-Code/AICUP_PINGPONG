@@ -1,0 +1,10 @@
+Missing values per column:
+unique_id             0
+player_id             0
+mode                  0
+gender                0
+hold racket handed    0
+play years            0
+level                 0
+cut_point             0
+dtype: int64
