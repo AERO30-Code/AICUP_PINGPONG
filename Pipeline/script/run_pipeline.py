@@ -8,7 +8,7 @@ import joblib
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.metrics import roc_auc_score 
-
+import numpy as np
 TARGETS_INFO = {
     "gender": {"type": "binary", "col": "gender"},
     "hold_racket_handed": {"type": "binary", "col": "hold racket handed"},
@@ -42,10 +42,12 @@ def resolve_paths(config, config_dir):
     def resolve(path):
         if not path: # 檢查 path 是否為 None 或空字串
             return path
-        if not os.path.isabs(path): # 將相對於設定檔目錄的路徑轉換為絕對路徑
-            resolved_path = os.path.abspath(os.path.join(config_dir, path))
-            return resolved_path
-        return path
+        # 檢查是否已經是絕對路徑
+        if os.path.isabs(path):
+             return path
+        # 否則，解析為相對於 config_dir 的絕對路徑
+        resolved_path = os.path.abspath(os.path.join(config_dir, path))
+        return resolved_path
 
     for key in config.get('paths', {}):
         config['paths'][key] = resolve(config['paths'].get(key))
@@ -53,10 +55,13 @@ def resolve_paths(config, config_dir):
     for key in config.get('output_paths', {}):
         config['output_paths'][key] = resolve(config['output_paths'].get(key))
 
+    feature_selection_config = config.get('feature_selection', {})
+    if 'rank_file_path' in feature_selection_config:
+        feature_selection_config['_resolved_rank_file_path'] = resolve(feature_selection_config['rank_file_path'])
+
     if 'generate_features_script' in config.get('paths', {}):
          config['paths']['generate_features_script'] = resolve(config['paths']['generate_features_script'])
 
-    # print("Path resolution completed.") # 移除此行減少輸出
     return config
 
 def import_generate_features(script_path):
@@ -173,6 +178,7 @@ def run_training_stage(config, train_feature_path):
     selected_targets = [t for t in train_config.get('targets_to_train', []) if t in TARGETS_INFO]
     output_paths_config = config['output_paths']
     paths_config = config['paths']
+    feature_selection_config = config.get('feature_selection', {})
 
     if not selected_targets:
         print("No targets specified for training in config. Skipping training stage.")
@@ -200,11 +206,79 @@ def run_training_stage(config, train_feature_path):
         print(f"Error loading training feature file {train_feature_path}: {e}")
         return None
 
+      # --- 特徵篩選 (New Block) ---
+    feature_selection_enabled = False # 標記是否實際執行了篩選
+    original_num_cols = df.shape[1] # 記錄原始欄位數
+    selected_top_n = None
+    used_rank_file = None
+    if feature_selection_config.get('enable', False):
+        print("Feature selection enabled.")
+        rank_file_path = feature_selection_config.get('_resolved_rank_file_path')
+        top_n = feature_selection_config.get('top_n')
+
+        if not rank_file_path or not top_n:
+            print("Warning: Feature selection enabled, but 'rank_file_path' or 'top_n' is missing in config. Skipping selection.")
+        elif not os.path.exists(rank_file_path):
+            print(f"Warning: Feature selection enabled, but rank file '{rank_file_path}' not found. Skipping selection.")
+        else:
+            try:
+                print(f"Loading feature ranks from: {rank_file_path}")
+                rank_df = pd.read_csv(rank_file_path)
+                if 'feature' not in rank_df.columns:
+                     print("Warning: Rank file must contain a 'feature' column. Skipping selection.")
+                else:
+                    selected_features = rank_df['feature'].head(top_n).tolist()
+                    print(f"Selecting top {top_n} features based on rank file.")
+                    selected_top_n = top_n # 記錄 top_n
+                    used_rank_file = rank_file_path # 記錄使用的檔案路徑
+
+                    # 確定要保留的欄位：unique_id + 所有目標欄位 + player_id(如果存在) + 篩選出的特徵
+                    cols_to_keep = ['unique_id']
+                    for t_info in TARGETS_INFO.values():
+                        if t_info['col'] in df.columns:
+                            cols_to_keep.append(t_info['col'])
+                    if config.get('feature_generation', {}).get('include_player_id_in_train', False) and 'player_id' in df.columns:
+                         cols_to_keep.append('player_id')
+
+                    # 檢查篩選出的特徵是否存在於 DataFrame 中
+                    valid_selected_features = [f for f in selected_features if f in df.columns]
+                    if len(valid_selected_features) < len(selected_features):
+                         print(f"Warning: {len(selected_features) - len(valid_selected_features)} selected features not found in the training data.")
+
+                    cols_to_keep.extend(valid_selected_features)
+                    cols_to_keep = list(set(cols_to_keep)) # 去重確保唯一
+
+                    # 執行篩選
+                    original_cols = df.shape[1]
+                    df = df[cols_to_keep]
+                    print(f"Applied feature selection. Shape changed from {original_cols} columns to {df.shape[1]} columns.")
+                    feature_selection_enabled = True # 標記已經執行了篩選
+            except Exception as e:
+                print(f"Error during feature selection: {e}. Skipping selection.")
+    else:
+         print("Feature selection disabled.") # 明確告知未啟用
+
     # 準備日誌記錄
     log_lines = []
     log_lines.append(f"Pipeline Run Time: {now}")
     log_lines.append(f"Training Feature Path: {os.path.basename(train_feature_path)}")
     log_lines.append(f"Output Directory: {current_run_output_dir}")
+
+    # --- 在日誌中加入 Feature Selection 設定 (New Block) ---
+    log_lines.append("\n--- Feature Selection Configuration Used ---")
+    if feature_selection_enabled:
+         log_lines.append(f"  Selection Enabled: True")
+         log_lines.append(f"  Rank File Used: {os.path.basename(used_rank_file) if used_rank_file else 'N/A'}")
+         log_lines.append(f"  Top N Features Selected: {selected_top_n if selected_top_n is not None else 'N/A'}")
+         log_lines.append(f"  Number of Columns After Selection: {df.shape[1]}") # 記錄篩選後欄位數
+    else:
+         # 如果 feature_selection.enable 為 True 但因錯誤跳過，也記錄一下
+         if feature_selection_config.get('enable', False):
+              log_lines.append(f"  Selection Enabled in Config: True")
+              log_lines.append(f"  Selection Skipped due to errors or missing file/config.")
+         else:
+              log_lines.append(f"  Selection Enabled: False")
+    log_lines.append("------------------------------------------")
 
     # --- 在日誌中加入 Feature Generation 設定 ---
     log_lines.append("\n--- Feature Generation Configuration Used ---")
@@ -243,18 +317,21 @@ def run_training_stage(config, train_feature_path):
 
         # 準備特徵 X 和標籤 y
         excluded_cols = ["unique_id"] + [t_info['col'] for t_info in TARGETS_INFO.values()]
-        if config['feature_generation'].get('include_player_id_in_train', False) and 'player_id' in df.columns:
+        if config.get('feature_generation', {}).get('include_player_id_in_train', False) and 'player_id' in df.columns:
             excluded_cols.append('player_id')
-        excluded_cols = [col for col in excluded_cols if col in df.columns]
+        excluded_cols = [col for col in excluded_cols if col in df.columns] # 只排除實際存在的欄位
+
+        # 特徵欄位是 df 中除了排除欄位以外的所有欄位
         feature_cols = [col for col in df.columns if col not in excluded_cols]
 
         if not feature_cols:
-             print(f"Error: No feature columns found for target {target} after exclusions. Skipping.")
+             print(f"Error: No feature columns remaining for target {target} after exclusions (and possibly selection). Skipping.")
              continue
+        print(f"Using {len(feature_cols)} features for training {target}.") # 顯示使用的特徵數量
 
         X = df[feature_cols]
         if y_col not in df.columns:
-             print(f"Error: Target column '{y_col}' not found in features file {train_feature_path}. Skipping target {target}.") # 保留錯誤
+             print(f"Error: Target column '{y_col}' not found in features file {train_feature_path}. Skipping target {target}.")
              continue
         y = df[y_col]
 
@@ -408,8 +485,8 @@ def run_prediction_stage(config, test_feature_path, model_run_dir_to_use):
     print("\n--- Running Prediction Stage ---")
     paths_config = config['paths']
     output_paths_config = config['output_paths']
-    # 獲取設定檔中定義要訓練的目標 (用於檢查是否該搜尋模型)
     trained_targets_in_config = set(config.get('training', {}).get('targets_to_train', []))
+    feature_selection_config = config.get('feature_selection', {})
 
     if not model_run_dir_to_use or not os.path.isdir(model_run_dir_to_use):
         print(f"Error: Model run directory '{model_run_dir_to_use}' not specified or not found. Aborting prediction.")
@@ -427,6 +504,53 @@ def run_prediction_stage(config, test_feature_path, model_run_dir_to_use):
     except Exception as e:
         print(f"Error loading test feature file {test_feature_path}: {e}")
         return
+
+    # --- 特徵篩選 (New Block for Prediction) ---
+    selected_feature_names_for_pred = None # 儲存篩選後的特徵名列表
+    if feature_selection_config.get('enable', False):
+        print("Feature selection enabled for prediction.")
+        rank_file_path = feature_selection_config.get('_resolved_rank_file_path')
+        top_n = feature_selection_config.get('top_n')
+
+        if not rank_file_path or not top_n:
+            print("Warning: Feature selection enabled, but 'rank_file_path' or 'top_n' is missing. Prediction might fail if models expect selected features.")
+        elif not os.path.exists(rank_file_path):
+            print(f"Warning: Feature selection enabled, but rank file '{rank_file_path}' not found. Prediction might fail.")
+        else:
+            try:
+                print(f"Loading feature ranks from: {rank_file_path}")
+                rank_df = pd.read_csv(rank_file_path)
+                if 'feature' not in rank_df.columns:
+                     print("Warning: Rank file must contain a 'feature' column. Cannot apply selection to test data.")
+                else:
+                    selected_feature_names_for_pred = rank_df['feature'].head(top_n).tolist()
+                    print(f"Selecting top {top_n} features for prediction.")
+
+                    # 確定要保留的欄位：unique_id + 篩選出的特徵
+                    cols_to_keep = ['unique_id']
+
+                    # 檢查篩選出的特徵是否存在於測試 DataFrame 中
+                    valid_selected_features = [f for f in selected_feature_names_for_pred if f in df_test.columns]
+                    if len(valid_selected_features) < len(selected_feature_names_for_pred):
+                         print(f"Warning: {len(selected_feature_names_for_pred) - len(valid_selected_features)} selected features not found in the test data. Models might expect them.")
+                         # 保留所有有效的篩選特徵
+                         selected_feature_names_for_pred = valid_selected_features
+
+
+                    cols_to_keep.extend(selected_feature_names_for_pred)
+                    cols_to_keep = list(set(cols_to_keep)) # 去重
+
+                    # 執行篩選
+                    original_cols = df_test.shape[1]
+                    # 只篩選實際存在的欄位，避免 KeyErrors
+                    cols_to_keep_existing = [col for col in cols_to_keep if col in df_test.columns]
+                    df_test = df_test[cols_to_keep_existing]
+                    print(f"Applied feature selection to test data. Shape changed from {original_cols} columns to {df_test.shape[1]} columns.")
+
+            except Exception as e:
+                print(f"Error during feature selection for test data: {e}. Prediction might fail.")
+    else:
+        print("Feature selection disabled for prediction.")
 
     # 讀取 sample submission
     try:
@@ -517,10 +641,12 @@ def run_prediction_stage(config, test_feature_path, model_run_dir_to_use):
             continue
 
         # --- 準備預測數據 X_test ---
-        excluded_cols = ["unique_id"] + [t_info['col'] for t_info in TARGETS_INFO.values() if t_info['col'] in df_test.columns]
-        if 'player_id' in df_test.columns:
-             excluded_cols.append('player_id')
-        feature_cols = [col for col in df_test.columns if col not in excluded_cols]
+        if selected_feature_names_for_pred is not None:
+             # feature_cols 應該是篩選後且存在於 df_test 中的特徵
+             feature_cols = [f for f in selected_feature_names_for_pred if f in df_test.columns]
+        else:
+             excluded_cols = ["unique_id"] + [t_info['col'] for t_info in TARGETS_INFO.values() if t_info['col'] in df_test.columns]
+             feature_cols = [col for col in df_test.columns if col not in excluded_cols]
 
         if not feature_cols:
             print(f"Error: No feature columns found for test data. Cannot predict for {target}.") # 保留錯誤
@@ -536,7 +662,40 @@ def run_prediction_stage(config, test_feature_path, model_run_dir_to_use):
         # --- 特徵縮放 ---
         if scaler:
             try:
-                X_test = scaler.transform(X_test)
+                # 獲取 Scaler 期望的特徵名稱和順序
+                expected_scaler_features = scaler.feature_names_in_
+
+                # 檢查 X_test 是否包含所有 Scaler 期望的特徵
+                missing_features = set(expected_scaler_features) - set(X_test.columns)
+                if missing_features:
+                     # 理論上，如果篩選邏輯正確，這裡不應該發生
+                     # 但如果發生，意味著測試集缺少了訓練時存在的某些頂級特徵
+                     print(f"Error: Test data is missing features expected by the scaler: {missing_features}")
+                     raise ValueError("Missing features required for scaler transformation.")
+
+                # 重新排序 X_test 的欄位以匹配 Scaler 的期望
+                X_test_reordered = X_test[expected_scaler_features]
+
+                # 應用 transform
+                X_test_scaled = scaler.transform(X_test_reordered)
+
+                # 將縮放後的 numpy array 轉換回 DataFrame，使用正確的欄位名和順序
+                X_test = pd.DataFrame(X_test_scaled, index=X_test_reordered.index, columns=expected_scaler_features)
+            except AttributeError:
+                 # 如果 scaler 沒有 feature_names_in_ (例如是舊版本或未使用 DataFrame fit)
+                 print("Warning: Scaler does not have 'feature_names_in_'. Applying transform without reordering, which might be unsafe.")
+                 try:
+                      # 嘗試直接 transform，但可能有風險
+                      X_test_scaled = scaler.transform(X_test)
+                      X_test = pd.DataFrame(X_test_scaled, index=X_test.index, columns=X_test.columns) # 假設順序未變
+                 except ValueError as ve:
+                      print(f"Error applying scaler (without reordering): {ve}")
+                      # ... (填充預設值) ...
+                      continue
+                 except Exception as e:
+                      print(f"Unexpected error applying scaler (without reordering): {e}")
+                      # ... (填充預設值) ...
+                      continue
             except ValueError as ve:
                  print(f"Error applying scaler to test data for target {target}: {ve}") # 保留錯誤
                  print("This might be due to a mismatch between training and test features.") # 保留提示
@@ -559,6 +718,18 @@ def run_prediction_stage(config, test_feature_path, model_run_dir_to_use):
 
         # --- 進行預測 ---
         try:
+            # 同樣，檢查模型是否期望特定的特徵順序
+            if hasattr(model, 'feature_names_in_'):
+                 model_expected_features = model.feature_names_in_
+                 missing_model_features = set(model_expected_features) - set(X_test.columns)
+                 if missing_model_features:
+                      print(f"Error: Scaled test data is missing features expected by the model: {missing_model_features}")
+                      raise ValueError("Missing features required for model prediction.")
+                 # 確保傳遞給模型的數據欄位順序正確
+                 X_test_for_model = X_test[model_expected_features]
+            else:
+                 # 如果模型不記錄期望的特徵，直接使用 X_test
+                 X_test_for_model = X_test
             proba = model.predict_proba(X_test)
             targets_predicted += 1
 

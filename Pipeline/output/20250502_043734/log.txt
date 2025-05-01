@@ -1,0 +1,21 @@
+Pipeline Run Time: 20250502_043734
+Training Feature Path: features_train_s4-e27.csv
+Output Directory: /Users/charlie/MBP16/Master_Data/AICUP/PINGPONG/Pipeline/output/20250502_043734
+
+--- Feature Generation Configuration Used ---
+  start_swing: 4
+  end_swing: 27
+  sensors_to_process: ['Ax', 'Ay', 'Az', 'Gx', 'Gy', 'Gz']
+  stats_to_calculate: ['mean', 'std', 'min', 'max', 'median', 'rms']
+  extra_features_to_include: ['test_time']
+  include_player_id_in_train: False
+-----------------------------------------
+
+Feature Scaling: zscore
+Trained Targets: gender
+
+Target: gender
+  Model Type: svm
+  Parameters: {'C': 1.0, 'gamma': 'scale', 'kernel': 'rbf', 'probability': True, 'random_state': 42}
+  Scaler Used: zscore (Saved: svm_gender_scaler.pkl)
+  Validation ROC AUC: 0.6129

@@ -361,7 +361,7 @@ leaderboard score * 4 - 1.5 = real score
     ```
 *   **Leaderboard Score:** 0.59220686
 ---
-
+### 測試 svm 訓練資料用 katsu 的資料 砍前後揮拍 這邊亂測試的不準
 **Experiment 30**
 
 *   **Experiment Path:** `Model/output/20250501_180031`
@@ -374,8 +374,6 @@ leaderboard score * 4 - 1.5 = real score
     ```
 *   **Leaderboard Score:** 0.59722361
 
----
-
 **Experiment 31**
 
 *   **Experiment Path:** `Model/output/20250501_180625`
@@ -387,3 +385,138 @@ leaderboard score * 4 - 1.5 = real score
     {'C': 0.01, 'gamma': 'scale', 'kernel': 'rbf', 'probability': True, 'random_state': 42}
     ```
 *   **Leaderboard Score:** 0.60783499
+---
+### 測試 svm 重構的程式碼和之前的分數比對 不同拍數
+**Experiment 32** (Exp18 0.61248313) 
+
+*   **Experiment Path:** `Pipeline/output/20250502_043008`
+*   **Model:** `svm_gender`
+*   **Feature Path:** `features_train_s1-e27.csv`
+*   **Scaling:** zscore
+*   **Parameters:**
+    ```python
+    {'kernel': 'rbf', 'C': 1.0, 'gamma': 'scale', 'probability': True, 'random_state': 42}
+    ```
+*   **Leaderboard Score:** 0.61256747
+
+**Experiment 33** (Exp19 0.6136723) 
+
+*   **Experiment Path:** `Pipeline/output/20250502_043734`
+*   **Model:** `svm_gender`
+*   **Feature Path:** `features_train_s4-e27.csv`
+*   **Scaling:** zscore
+*   **Parameters:**
+    ```python
+    {'kernel': 'rbf', 'C': 1.0, 'gamma': 'scale', 'probability': True, 'random_state': 42}
+    ```
+*   **Leaderboard Score:** 0.61349835
+
+**Experiment 34**
+
+*   **Experiment Path:** `Pipeline/output/20250502_043758`
+*   **Model:** `svm_gender`
+*   **Feature Path:** `features_train_s4-e24.csv`
+*   **Scaling:** zscore
+*   **Parameters:**
+    ```python
+    {'kernel': 'rbf', 'C': 1.0, 'gamma': 'scale', 'probability': True, 'random_state': 42}
+    ```
+*   **Leaderboard Score:** 0.61214576
+---
+### 測試 svm 重構的程式碼 去掉GxGyGz 不同拍數
+**Experiment 35**
+
+*   **Experiment Path:** `Pipeline/output/20250502_061834`
+*   **Model:** `svm_gender`
+*   **Feature Path:** `features_train_s1-e27.csv`
+*   **Scaling:** zscore
+*   **Parameters:**
+    ```python
+    {'kernel': 'rbf', 'C': 1.0, 'gamma': 'scale', 'probability': True, 'random_state': 42}
+    ```
+*   **Leaderboard Score:** 0.60164684
+
+**Experiment 36**
+
+*   **Experiment Path:** `Pipeline/output/20250502_061856`
+*   **Model:** `svm_gender`
+*   **Feature Path:** `features_train_s4-e27.csv`
+*   **Scaling:** zscore
+*   **Parameters:**
+    ```python
+    {'kernel': 'rbf', 'C': 1.0, 'gamma': 'scale', 'probability': True, 'random_state': 42}
+    ```
+*   **Leaderboard Score:** 0.60214351
+
+**Experiment 37**
+
+*   **Experiment Path:** `Pipeline/output/20250502_061914`
+*   **Model:** `svm_gender`
+*   **Feature Path:** `features_train_s4-e24.csv`
+*   **Scaling:** zscore
+*   **Parameters:**
+    ```python
+    {'kernel': 'rbf', 'C': 1.0, 'gamma': 'scale', 'probability': True, 'random_state': 42}
+    ```
+*   **Leaderboard Score:** 0.60090026
+---
+### 測試 svm 重構的程式碼 s4-e27 只保留基於樹模型的重要特徵 4models 不同top數
+**Experiment 38** (Exp24 0.61533511) top500
+
+*   **Experiment Path:** `Pipeline/output/20250502_070240`
+*   **Model:** `svm_gender`
+*   **Feature Path:** `features_train_s4-e27.csv`
+*   **Scaling:** zscore
+*   **Parameters:**
+    ```python
+    {'kernel': 'rbf', 'C': 1.0, 'gamma': 'scale', 'probability': True, 'random_state': 42}
+    ```
+*   **Leaderboard Score:** 0.61499931
+
+**Experiment 39** top300
+
+*   **Experiment Path:** `Pipeline/output/20250502_070527`
+*   **Model:** `svm_gender`
+*   **Feature Path:** `features_train_s4-e27.csv`
+*   **Scaling:** zscore
+*   **Parameters:**
+    ```python
+    {'kernel': 'rbf', 'C': 1.0, 'gamma': 'scale', 'probability': True, 'random_state': 42}
+    ```
+*   **Leaderboard Score:** 0.61472129
+
+**Experiment 40** top100
+
+*   **Experiment Path:** `Pipeline/output/20250502_070538`
+*   **Model:** `svm_gender`
+*   **Feature Path:** `features_train_s4-e27.csv`
+*   **Scaling:** zscore
+*   **Parameters:**
+    ```python
+    {'kernel': 'rbf', 'C': 1.0, 'gamma': 'scale', 'probability': True, 'random_state': 42}
+    ```
+*   **Leaderboard Score:** 0.60397872
+
+**Experiment 40** top600
+
+*   **Experiment Path:** `Pipeline/output/20250502_071333`
+*   **Model:** `svm_gender`
+*   **Feature Path:** `features_train_s4-e27.csv`
+*   **Scaling:** zscore
+*   **Parameters:**
+    ```python
+    {'kernel': 'rbf', 'C': 1.0, 'gamma': 'scale', 'probability': True, 'random_state': 42}
+    ```
+*   **Leaderboard Score:** 
+
+**Experiment 40** top400
+
+*   **Experiment Path:** `Pipeline/output/20250502_071339`
+*   **Model:** `svm_gender`
+*   **Feature Path:** `features_train_s4-e27.csv`
+*   **Scaling:** zscore
+*   **Parameters:**
+    ```python
+    {'kernel': 'rbf', 'C': 1.0, 'gamma': 'scale', 'probability': True, 'random_state': 42}
+    ```
+*   **Leaderboard Score:** 
