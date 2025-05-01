@@ -1,0 +1,94 @@
+
+run_stages:
+  feature_generation: True  # 是否執行特徵生成
+  training: True            # 是否執行模型訓練
+  prediction: True          # 是否執行預測與提交
+
+# 相對於 pipeline_config.yaml 的路徑，或使用絕對路徑
+paths:
+  generate_features_script: "../../Feature/script/generate_features.py" 
+  train_info: "../../Original/train/train_info.csv"
+  train_data: "../../Original/train/train_data"
+  test_info: "../../Original/test/test_info.csv"
+  test_data: "../../Original/test/test_data"
+  sample_submission: "../../Original/test/sample_submission.csv" # sample submission 用於確定輸出欄位順序
+
+output_paths:
+  generated_features: "../../Feature/generated"
+  model_runs: "../../Pipeline/output"
+  submission: "../../Pipeline/submission"
+
+# --- Feature Generation Settings ---
+# 起始揮拍 (1-based) 結束揮拍 (1-based)
+feature_generation:
+  start_swing: 2
+  end_swing: 27
+  sensors_to_process:
+    - Ax
+    - Ay
+    - Az
+    - Gx
+    - Gy
+    - Gz
+  stats_to_calculate:
+    - mean
+    - std
+    - min
+    - max
+    - median
+    - rms
+  extra_features_to_include:
+    - test_time
+  include_player_id_in_train: False
+
+# --- Training Settings ---
+training:
+  feature_scaling: zscore   # "zscore", "minmax", "none"
+  targets_to_train:
+    - gender
+    # - hold_racket_handed
+    # - play_years
+    # - level
+  models:
+    gender:
+      model_type: svm
+      params:
+        C: 0.01
+        gamma: scale
+        kernel: rbf
+        probability: True
+        random_state: 42
+    hold_racket_handed:
+      model_type: xgboost
+      params:
+        n_estimators: 100
+        max_depth: 6
+        learning_rate: 0.1
+        subsample: 0.8
+        random_state: 42
+        use_label_encoder: False
+        eval_metric: logloss
+    play_years:
+      model_type: xgboost
+      params:
+        n_estimators: 100
+        max_depth: 6
+        learning_rate: 0.1
+        subsample: 0.8
+        random_state: 42
+        use_label_encoder: False
+        eval_metric: mlogloss
+        objective: multi:softprob
+    level:
+      model_type: RandomForest
+      params:
+        n_estimators: 200
+        max_depth: 8
+        random_state: 42
+
+# --- Prediction Settings ---
+prediction:
+  # 指定要用來預測的模型運行目錄名稱 (相對於 output_paths.model_runs)
+  # 如果 training 階段為 true，這裡通常會被忽略 (使用剛訓練好的模型)
+  # 如果 training 階段為 false 且 prediction 為 true，則必須指定此項
+  model_run_to_use: "20250502_031818" # 例如 "20250501_180625" 或留空/註解掉
