@@ -461,7 +461,7 @@ leaderboard score * 4 - 1.5 = real score
 *   **Leaderboard Score:** 0.60090026
 ---
 ### 測試 svm 重構的程式碼 s4-e27 只保留基於樹模型的重要特徵 4models 不同top數
-**Experiment 38** (Exp24 0.61533511) top500
+**Experiment 38** (Exp24 0.61533511) top500 BEST
 
 *   **Experiment Path:** `Pipeline/output/20250502_070240`
 *   **Model:** `svm_gender`
@@ -507,13 +507,64 @@ leaderboard score * 4 - 1.5 = real score
     ```python
     {'kernel': 'rbf', 'C': 1.0, 'gamma': 'scale', 'probability': True, 'random_state': 42}
     ```
-*   **Leaderboard Score:** 
+*   **Leaderboard Score:** 0.61452762
 
 **Experiment 40** top400
 
 *   **Experiment Path:** `Pipeline/output/20250502_071339`
 *   **Model:** `svm_gender`
 *   **Feature Path:** `features_train_s4-e27.csv`
+*   **Scaling:** zscore
+*   **Parameters:**
+    ```python
+    {'kernel': 'rbf', 'C': 1.0, 'gamma': 'scale', 'probability': True, 'random_state': 42}
+    ```
+*   **Leaderboard Score:** 0.61491653
+---
+### 測試 svm 重構的程式碼 s5-e27 只保留基於樹模型的重要特徵 4models 不同top數
+**Experiment 41** top500
+
+*   **Experiment Path:** `Pipeline/output/20250502_180217`
+*   **Model:** `svm_gender`
+*   **Feature Path:** `features_train_s5-e27.csv`
+*   **Scaling:** zscore
+*   **Parameters:**
+    ```python
+    {'kernel': 'rbf', 'C': 1.0, 'gamma': 'scale', 'probability': True, 'random_state': 42}
+    ```
+*   **Leaderboard Score:** 0.61466975
+
+**Experiment 42** top400 
+
+*   **Experiment Path:** `Pipeline/output/20250502_180239`
+*   **Model:** `svm_gender`
+*   **Feature Path:** `features_train_s5-e27.csv`
+*   **Scaling:** zscore
+*   **Parameters:**
+    ```python
+    {'kernel': 'rbf', 'C': 1.0, 'gamma': 'scale', 'probability': True, 'random_state': 42}
+    ```
+*   **Leaderboard Score:** 0.61518205 
+---
+#### 之後都 調整精度 .6f
+---
+**Experiment 43** top400 BEST
+
+*   **Experiment Path:** `Pipeline/output/20250502_181245`
+*   **Model:** `svm_gender`
+*   **Feature Path:** `features_train_s5-e27.csv`
+*   **Scaling:** zscore
+*   **Parameters:**
+    ```python
+    {'kernel': 'rbf', 'C': 1.0, 'gamma': 'scale', 'probability': True, 'random_state': 42}
+    ```
+*   **Leaderboard Score:** 0.61517892
+
+**Experiment 44** top450
+
+*   **Experiment Path:** `Pipeline/output/20250502_181633`
+*   **Model:** `svm_gender`
+*   **Feature Path:** `features_train_s5-e27.csv`
 *   **Scaling:** zscore
 *   **Parameters:**
     ```python

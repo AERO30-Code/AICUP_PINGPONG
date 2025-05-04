@@ -444,8 +444,8 @@ def run_training_stage(config, train_feature_path):
                         auc = roc_auc_score(y_val, y_val_proba[:, 0])
                 else:
                     auc = roc_auc_score(y_val, y_val_proba, average="micro", multi_class="ovr")
-                print(f"Validation ROC AUC: {auc:.4f}")
-                log_lines.append(f"  Validation ROC AUC: {auc:.4f}")
+                print(f"Validation ROC AUC: {auc:.6f}")
+                log_lines.append(f"  Validation ROC AUC: {auc:.6f}")
                 validation_results[target] = auc
             except Exception as e:
                 print(f"Error during validation/scoring for target {target}: {e}")
@@ -468,7 +468,7 @@ def run_training_stage(config, train_feature_path):
         # log_lines.append("\n--- Validation AUC Summary ---")
         # if validation_results:
         #     for target, auc in validation_results.items():
-        #         log_lines.append(f"{target}: {auc:.4f}" if auc is not None else f"{target}: Error/Skipped")
+        #         log_lines.append(f"{target}: {auc:.6f}" if auc is not None else f"{target}: Error/Skipped")
         # else:
         #     log_lines.append("No validation results.")
 
@@ -575,12 +575,12 @@ def run_prediction_stage(config, test_feature_path, model_run_dir_to_use):
         if target not in trained_targets_in_config:
             # 直接填充預設值並繼續
             if mode == 'binary':
-                 submit_df[y_col_original] = float("{:.4f}".format(0.5))
+                 submit_df[y_col_original] = float("{:.6f}".format(0.5))
             elif target == 'play_years':
-                 default_prob = float("{:.4f}".format(1/3))
+                 default_prob = float("{:.6f}".format(1/3))
                  for i in range(3): submit_df[f"play years_{i}"] = default_prob
             elif target == 'level':
-                 default_prob = float("{:.4f}".format(0.25))
+                 default_prob = float("{:.6f}".format(0.25))
                  for i in range(2, 6): submit_df[f"level_{i}"] = default_prob
             continue # 繼續下一個 target
 
@@ -612,12 +612,12 @@ def run_prediction_stage(config, test_feature_path, model_run_dir_to_use):
         # --- 如果找不到模型 (即使設定要訓練)，填充預設值並繼續 ---
         if not model_path:
             if mode == 'binary':
-                 submit_df[y_col_original] = float("{:.4f}".format(0.5))
+                 submit_df[y_col_original] = float("{:.6f}".format(0.5))
             elif target == 'play_years':
-                 default_prob = float("{:.4f}".format(1/3))
+                 default_prob = float("{:.6f}".format(1/3))
                  for i in range(3): submit_df[f"play years_{i}"] = default_prob
             elif target == 'level':
-                 default_prob = float("{:.4f}".format(0.25))
+                 default_prob = float("{:.6f}".format(0.25))
                  for i in range(2, 6): submit_df[f"level_{i}"] = default_prob
             continue
 
@@ -631,12 +631,12 @@ def run_prediction_stage(config, test_feature_path, model_run_dir_to_use):
             print(f"Error loading model or scaler for target {target}: {e}")
             print(f"Filling default probabilities for {target}")
             if mode == 'binary':
-                 submit_df[y_col_original] = float("{:.4f}".format(0.5))
+                 submit_df[y_col_original] = float("{:.6f}".format(0.5))
             elif target == 'play_years':
-                 default_prob = float("{:.4f}".format(1/3))
+                 default_prob = float("{:.6f}".format(1/3))
                  for i in range(3): submit_df[f"play years_{i}"] = default_prob
             elif target == 'level':
-                 default_prob = float("{:.4f}".format(0.25))
+                 default_prob = float("{:.6f}".format(0.25))
                  for i in range(2, 6): submit_df[f"level_{i}"] = default_prob
             continue
 
@@ -650,11 +650,11 @@ def run_prediction_stage(config, test_feature_path, model_run_dir_to_use):
 
         if not feature_cols:
             print(f"Error: No feature columns found for test data. Cannot predict for {target}.") # 保留錯誤
-            if mode == 'binary': submit_df[y_col_original] = float("{:.4f}".format(0.5))
+            if mode == 'binary': submit_df[y_col_original] = float("{:.6f}".format(0.5))
             elif target == 'play_years':
-                default_prob = float("{:.4f}".format(1/3)); [submit_df.update({f"play years_{i}": default_prob}) for i in range(3)]
+                default_prob = float("{:.6f}".format(1/3)); [submit_df.update({f"play years_{i}": default_prob}) for i in range(3)]
             elif target == 'level':
-                default_prob = float("{:.4f}".format(0.25)); [submit_df.update({f"level_{i}": default_prob}) for i in range(2, 6)]
+                default_prob = float("{:.6f}".format(0.25)); [submit_df.update({f"level_{i}": default_prob}) for i in range(2, 6)]
             continue
 
         X_test = df_test[feature_cols]
@@ -700,20 +700,20 @@ def run_prediction_stage(config, test_feature_path, model_run_dir_to_use):
                  print(f"Error applying scaler to test data for target {target}: {ve}") # 保留錯誤
                  print("This might be due to a mismatch between training and test features.") # 保留提示
                  print(f"Filling default probabilities for {target}") # 保留提示
-                 if mode == 'binary': submit_df[y_col_original] = float("{:.4f}".format(0.5))
+                 if mode == 'binary': submit_df[y_col_original] = float("{:.6f}".format(0.5))
                  elif target == 'play_years':
-                     default_prob = float("{:.4f}".format(1/3)); [submit_df.update({f"play years_{i}": default_prob}) for i in range(3)]
+                     default_prob = float("{:.6f}".format(1/3)); [submit_df.update({f"play years_{i}": default_prob}) for i in range(3)]
                  elif target == 'level':
-                     default_prob = float("{:.4f}".format(0.25)); [submit_df.update({f"level_{i}": default_prob}) for i in range(2, 6)]
+                     default_prob = float("{:.6f}".format(0.25)); [submit_df.update({f"level_{i}": default_prob}) for i in range(2, 6)]
                  continue
             except Exception as e:
                 print(f"Unexpected error applying scaler to test data for target {target}: {e}") # 保留錯誤
                 print(f"Filling default probabilities for {target}") # 保留提示
-                if mode == 'binary': submit_df[y_col_original] = float("{:.4f}".format(0.5))
+                if mode == 'binary': submit_df[y_col_original] = float("{:.6f}".format(0.5))
                 elif target == 'play_years':
-                    default_prob = float("{:.4f}".format(1/3)); [submit_df.update({f"play years_{i}": default_prob}) for i in range(3)]
+                    default_prob = float("{:.6f}".format(1/3)); [submit_df.update({f"play years_{i}": default_prob}) for i in range(3)]
                 elif target == 'level':
-                    default_prob = float("{:.4f}".format(0.25)); [submit_df.update({f"level_{i}": default_prob}) for i in range(2, 6)]
+                    default_prob = float("{:.6f}".format(0.25)); [submit_df.update({f"level_{i}": default_prob}) for i in range(2, 6)]
                 continue
 
         # --- 進行預測 ---
@@ -748,7 +748,7 @@ def run_prediction_stage(config, test_feature_path, model_run_dir_to_use):
                              submit_df[submit_col_name] = proba[:, i]
                 else:
                     print(f"Warning: Cannot determine class order or probability shape mismatch for {target}. Filling defaults.") # 保留警告
-                    default_prob = float("{:.4f}".format(1/3)); [submit_df.update({f"play years_{i}": default_prob}) for i in range(3)]
+                    default_prob = float("{:.6f}".format(1/3)); [submit_df.update({f"play years_{i}": default_prob}) for i in range(3)]
             elif target == 'level':
                 if hasattr(model, 'classes_') and proba.shape[1] == len(model.classes_):
                     original_min_level = 2
@@ -759,25 +759,25 @@ def run_prediction_stage(config, test_feature_path, model_run_dir_to_use):
                              submit_df[submit_col_name] = proba[:, i]
                 else:
                     print(f"Warning: Cannot determine class order or probability shape mismatch for {target}. Filling defaults.") # 保留警告
-                    default_prob = float("{:.4f}".format(0.25)); [submit_df.update({f"level_{i}": default_prob}) for i in range(2, 6)]
+                    default_prob = float("{:.6f}".format(0.25)); [submit_df.update({f"level_{i}": default_prob}) for i in range(2, 6)]
 
         except AttributeError as ae:
              print(f"Error: Model for {target} might not support predict_proba ({ae}). Filling defaults.") # 保留錯誤
-             if mode == 'binary': submit_df[y_col_original] = float("{:.4f}".format(0.5))
+             if mode == 'binary': submit_df[y_col_original] = float("{:.6f}".format(0.5))
              elif target == 'play_years':
-                 default_prob = float("{:.4f}".format(1/3)); [submit_df.update({f"play years_{i}": default_prob}) for i in range(3)]
+                 default_prob = float("{:.6f}".format(1/3)); [submit_df.update({f"play years_{i}": default_prob}) for i in range(3)]
              elif target == 'level':
-                 default_prob = float("{:.4f}".format(0.25)); [submit_df.update({f"level_{i}": default_prob}) for i in range(2, 6)]
+                 default_prob = float("{:.6f}".format(0.25)); [submit_df.update({f"level_{i}": default_prob}) for i in range(2, 6)]
              continue
         except Exception as e:
             print(f"Error during prediction for target {target}: {e}") # 保留錯誤
             print(f"Filling default probabilities for {target}") # 保留提示
             if mode == 'binary':
-                 submit_df[y_col_original] = float("{:.4f}".format(0.5))
+                 submit_df[y_col_original] = float("{:.6f}".format(0.5))
             elif target == 'play_years':
-                 default_prob = float("{:.4f}".format(1/3)); [submit_df.update({f"play years_{i}": default_prob}) for i in range(3)]
+                 default_prob = float("{:.6f}".format(1/3)); [submit_df.update({f"play years_{i}": default_prob}) for i in range(3)]
             elif target == 'level':
-                 default_prob = float("{:.4f}".format(0.25)); [submit_df.update({f"level_{i}": default_prob}) for i in range(2, 6)]
+                 default_prob = float("{:.6f}".format(0.25)); [submit_df.update({f"level_{i}": default_prob}) for i in range(2, 6)]
             continue
 
 
@@ -790,9 +790,9 @@ def run_prediction_stage(config, test_feature_path, model_run_dir_to_use):
                 missing_cols_filled = True
             print(f"  - Filling '{col}'") # 保留填充的欄位名
             # 填充預設值 (使用格式化)
-            if "gender" in col or "hold racket handed" in col: submit_df[col] = float("{:.4f}".format(0.5))
-            elif "play_years" in col: submit_df[col] = float("{:.4f}".format(1/3))
-            elif "level" in col: submit_df[col] = float("{:.4f}".format(0.25))
+            if "gender" in col or "hold racket handed" in col: submit_df[col] = float("{:.6f}".format(0.5))
+            elif "play_years" in col: submit_df[col] = float("{:.6f}".format(1/3))
+            elif "level" in col: submit_df[col] = float("{:.6f}".format(0.25))
             elif col != "unique_id": submit_df[col] = 0.0000
 
     if targets_predicted == 0 and not missing_cols_filled:
@@ -809,7 +809,7 @@ def run_prediction_stage(config, test_feature_path, model_run_dir_to_use):
         # 依照 sample submission 的欄位順序排列並儲存
         submit_df = submit_df[submission_columns]
         # 使用 float_format 控制輸出精度
-        submit_df.to_csv(submission_path, index=False, float_format="%.4f")
+        submit_df.to_csv(submission_path, index=False, float_format="%.6f")
         print(f"Submission file saved to: {submission_path}")
     except KeyError as ke:
          print(f"Error: Column '{ke}' not found when reordering submission columns. Check sample submission and predictions.") # 保留錯誤
