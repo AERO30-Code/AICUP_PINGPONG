@@ -3,8 +3,8 @@ import pandas as pd
 import joblib
 import numpy as np
 
-FEATURE_PATH = "Feature/katsu/test_v3.csv"
-MODEL_DIR = "Model/output/20250501_180625"
+FEATURE_PATH = "Feature/katsu/katsu_test_20250507.csv"
+MODEL_DIR = "Model/output/20250507_183220"
 MODEL_FOLDER_NAME = os.path.basename(MODEL_DIR.rstrip('/'))
 SUBMIT_PATH = f"Model/submission/submission_{MODEL_FOLDER_NAME}.csv"
 

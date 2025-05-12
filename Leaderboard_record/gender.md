@@ -570,4 +570,4 @@ leaderboard score * 4 - 1.5 = real score
     ```python
     {'kernel': 'rbf', 'C': 1.0, 'gamma': 'scale', 'probability': True, 'random_state': 42}
     ```
-*   **Leaderboard Score:** 
+*   **Leaderboard Score:** 0.61494933 

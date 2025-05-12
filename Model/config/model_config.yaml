@@ -9,7 +9,7 @@ train_targets:
 gender:
   model: svm
   params:
-    C: 0.01
+    C: 1.0
     gamma: scale
     kernel: rbf
     probability: True

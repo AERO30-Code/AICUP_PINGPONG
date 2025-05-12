@@ -14,7 +14,7 @@ from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.linear_model import LogisticRegression
 import datetime
 CONFIG_PATH = "Model/config/model_config.yaml"
-FEATURE_PATH = "Feature/katsu/train_v3.csv"
+FEATURE_PATH = "Feature/katsu/katsu_train_20250507.csv"
 MODEL_DIR = "Model/output/"
 
 # 目標與型態設定
