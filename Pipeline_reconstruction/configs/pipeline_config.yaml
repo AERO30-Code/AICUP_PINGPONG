@@ -1,0 +1,12 @@
+run_stages:
+  feature_generation: true
+  feature_selection: true
+  training: true
+  prediction: true
+
+paths:
+  features_config: Pipeline_reconstruction/configs/features_config.yaml
+  selection_config: Pipeline_reconstruction/configs/features_selection_config.yaml
+  training_config: Pipeline_reconstruction/configs/training_config.yaml
+  predict_config: Pipeline_reconstruction/configs/predict_config.yaml
+  model_base_dir: Pipeline_reconstruction/outputs/models/

@@ -1,0 +1,29 @@
+defaults:
+  gender:
+    gender: 0.5
+  hold racket handed:
+    hold racket handed: 0.5
+  level:
+    level_2: 0.25
+    level_3: 0.25
+    level_4: 0.25
+    level_5: 0.25
+  play_years:
+    play years_0: 0.3333
+    play years_1: 0.3333
+    play years_2: 0.3334
+input:
+  model_dir: Pipeline_reconstruction/outputs/models/20250514_042116
+  rank_csv: Pipeline_reconstruction/outputs/feature_rankings/mean_rank.csv
+  sample_submission_csv: Original/test/sample_submission.csv
+  test_feature_csv: Pipeline_reconstruction/outputs/features/features_test.csv
+output:
+  submission_dir: Pipeline_reconstruction/outputs/submissions/
+prediction:
+  top_n: 450
+  use_top_n: true
+targets:
+  gender:
+    model_type: svm
+    output_columns:
+    - gender
