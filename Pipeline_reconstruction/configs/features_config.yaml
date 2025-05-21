@@ -1,5 +1,5 @@
 # 0-based swing0 - swing26
-start_swing: 0
+start_swing: 2
 end_swing: 26
 sensors: [Ax, Ay, Az, Gx, Gy, Gz]
 stats: [mean, std, min, max, median, rms]

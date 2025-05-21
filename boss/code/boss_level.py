@@ -437,10 +437,10 @@ def train_and_predict_for_mode(mode_filter, model_name, eval_mode=True, model_ty
         model_type: Type of model to use ('random_forest' or 'xgboost')
     """
     # Define paths
-    train_data_dir = 'data/39_Training_Dataset/train_data'
-    train_info_path = 'data/39_Training_Dataset/train_info.csv'
-    test_data_dir = 'data/39_Test_Dataset/test_data'
-    test_info_path = 'data/39_Test_Dataset/test_info.csv'
+    train_data_dir = 'Original/train/train_data'
+    train_info_path = 'Original/train/train_info.csv'
+    test_data_dir = 'Original/test/test_data'
+    test_info_path = 'Original/test/test_info.csv'
 
     # Process training data
     print(f"Processing training data for {model_name}...")
@@ -514,7 +514,7 @@ def train_and_predict_for_mode(mode_filter, model_name, eval_mode=True, model_ty
     plt.bar(np.array(imp_names)[idx][-20:], imp_vals[idx][-20:])
     plt.xticks(rotation=90)
     plt.tight_layout()
-    plt.savefig(f'{str(mode_filter)}_{model_name}_feature_importance.png')
+    # plt.savefig(f'{str(mode_filter)}_{model_name}_feature_importance.png')
 
     return results_df, val_auc
 
@@ -549,7 +549,7 @@ def combine_predictions(eval_mode=True, model_type='random_forest'):
     all_predictions = all_predictions.sort_values('unique_id')
 
     # Save combined predictions
-    output_path = 'levels_predictions.csv'
+    output_path = 'boss/submissions_final/levels_predictions.csv'
     all_predictions.to_csv(output_path, index=False)
     print(f"\nCombined predictions saved to {output_path}")
 
@@ -570,3 +570,8 @@ if __name__ == "__main__":
 
     # tbrain -> single -> baseline
     # 0.58412221 -> 0.83648884
+
+
+"""
+/opt/anaconda3/envs/aicup/bin/python /Users/charlie/MBP16/Master_Data/AICUP/PINGPONG/boss/code/boss_level.py --model svm --mode all
+"""

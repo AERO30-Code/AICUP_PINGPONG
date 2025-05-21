@@ -1,0 +1,36 @@
+input:
+  feature_csv: Pipeline_reconstruction/outputs/features/features_train.csv
+  rank_csv: Pipeline_reconstruction/outputs/feature_rankings/mean_rank.csv 
+  use_top_n: true
+  top_n: 400
+
+training:
+  targets_to_train:
+    - gender
+    # - level
+
+  feature_scaling: zscore  # zscore, minmax, none
+
+  models:
+    gender:
+      model_type: svm
+      params:
+        C: 1.0
+        gamma: scale
+        kernel: rbf
+        probability: true
+        random_state: 42
+
+    play_years:
+      model_type: xgboost
+      params:
+        n_estimators: 100
+        max_depth: 6
+        learning_rate: 0.1
+        subsample: 0.8
+        random_state: 42
+        use_label_encoder: false
+        eval_metric: logloss
+
+output:
+  model_dir: Pipeline_reconstruction/outputs/models/

@@ -1,0 +1,39 @@
+input:
+  feature_csv: Pipeline_reconstruction/outputs/features/features_train.csv
+
+target: gender
+
+models:
+  xgb:
+    model_type: xgboost
+    params:
+      n_estimators: 100
+      max_depth: 6
+      learning_rate: 0.1
+      subsample: 0.8
+  rf:
+    model_type: randomforest
+    params:
+      n_estimators: 200
+      max_depth: 8
+      random_state: 42
+  lgbm:
+    model_type: lightgbm
+    params:
+      n_estimators: 200
+      max_depth: 8
+      learning_rate: 0.1
+      subsample: 0.8
+      colsample_bytree: 0.8
+      random_state: 42
+  cat:
+    model_type: catboost
+    params:
+      iterations: 200
+      depth: 8
+      learning_rate: 0.1
+      random_seed: 42
+      verbose: False
+
+output:
+  rank_csv: Pipeline_reconstruction/outputs/feature_rankings/mean_rank.csv

@@ -2,7 +2,7 @@ input:
   feature_csv: Pipeline_reconstruction/outputs/features/features_train.csv
   rank_csv: Pipeline_reconstruction/outputs/feature_rankings/mean_rank.csv 
   use_top_n: true
-  top_n: 450
+  top_n: 250
 
 training:
   targets_to_train:
