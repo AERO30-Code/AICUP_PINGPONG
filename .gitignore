@@ -1,6 +1,8 @@
 # macOS
 .DS_Store
 
+boss/code/table
+
 # Python
 __pycache__/
 *.py[cod]
