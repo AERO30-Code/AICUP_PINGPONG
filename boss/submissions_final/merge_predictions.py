@@ -34,12 +34,12 @@ def main():
             "id_col": "unique_id"
         },
         {
-            "path": 'boss/submissions_final/0521_153128/play_years_predictions.csv',
-            "columns_to_use": None,
+            "path": 'boss/submissions_final/only_target/only_play_years_0522_122626.csv',
+            "columns_to_use": ['play years_0', 'play years_1', 'play years_2'],
             "id_col": "unique_id"
         },
         {
-            "path": 'Pipeline_reconstruction/outputs/submissions/submission_20250521_162003.csv', # Relative to PINGPONG
+            "path": 'Pipeline_reconstruction/outputs/submissions/submission_20250521_160424.csv', # Relative to PINGPONG
             "columns_to_use": ['gender'],  # Only use 'gender' column from this file
             "id_col": "unique_id"
         }

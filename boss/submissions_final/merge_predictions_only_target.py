@@ -43,7 +43,7 @@ def main():
     # Path to the specific prediction CSV file to patch into the reference
     # Relative from PINGPONG directory
     # !! 請用戶根據實際情況修改此路徑 !!
-    prediction_patch_file_path = 'boss/submissions_final/0521_153128/play_years_predictions.csv' # 範例路徑
+    prediction_patch_file_path = 'boss/submissions_final/play_years_predictions.csv' # 範例路徑
 
     # Output directory for the patched submission CSV file
     # Relative from PINGPONG directory
