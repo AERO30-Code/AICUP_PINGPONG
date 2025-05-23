@@ -138,9 +138,9 @@ def extract_features(data):
         'mean_acc': np.mean(acc_mag),
         'std_acc': np.std(acc_mag),
 
-        # 'max_gyr_acc': np.max(gyr_mag),
-        # 'mean_gyr_acc': np.mean(gyr_mag),
-        # 'std_gyr_acc': np.std(gyr_mag),
+        'max_gyr_acc': np.max(gyr_mag),
+        'mean_gyr_acc': np.mean(gyr_mag),
+        'std_gyr_acc': np.std(gyr_mag),
 
         # Axis-specific features
         'x_std': np.std(ax),

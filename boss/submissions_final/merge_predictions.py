@@ -24,22 +24,26 @@ def main():
     # Paths are relative from PINGPONG directory
     predictions_files_info = [
         {
+            # Level
             "path": 'boss/submissions_final/0521_153128/levels_predictions.csv',
             "columns_to_use": None,  # None means use all columns except unique_id
             "id_col": "unique_id"
         },
         {
+            # Hold racket handed
             "path": 'boss/submissions_final/0521_153128/holds_predictions.csv',
             "columns_to_use": None,
             "id_col": "unique_id"
         },
         {
-            "path": 'boss/submissions_final/only_target/only_play_years_0522_122626.csv',
+            # Play years
+            "path": 'boss/submissions_final/only_target/only_play_years_0522_131944.csv',
             "columns_to_use": ['play years_0', 'play years_1', 'play years_2'],
             "id_col": "unique_id"
         },
         {
-            "path": 'Pipeline_reconstruction/outputs/submissions/submission_20250521_160424.csv', # Relative to PINGPONG
+            # Gender
+            "path": 'Pipeline_reconstruction/outputs/submissions/submission_20250521_162003.csv', # Relative to PINGPONG
             "columns_to_use": ['gender'],  # Only use 'gender' column from this file
             "id_col": "unique_id"
         }

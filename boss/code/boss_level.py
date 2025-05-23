@@ -172,12 +172,12 @@ def extract_features(data):
         # Percentile features
         'acc_75th': np.percentile(acc_mag, 75),
         'acc_25th': np.percentile(acc_mag, 25),
-        # 'acc_75th_ax': np.percentile(ax, 75),
-        # 'acc_25th_ax': np.percentile(ax, 25),
-        # 'acc_75th_ay': np.percentile(ay, 75),
-        # 'acc_25th_ay': np.percentile(ay, 25),
-        # 'acc_75th_az': np.percentile(az, 75),
-        # 'acc_25th_az': np.percentile(az, 25),
+        'acc_75th_ax': np.percentile(ax, 75),
+        'acc_25th_ax': np.percentile(ax, 25),
+        'acc_75th_ay': np.percentile(ay, 75),
+        'acc_25th_ay': np.percentile(ay, 25),
+        'acc_75th_az': np.percentile(az, 75),
+        'acc_25th_az': np.percentile(az, 25),
 
         # 'acc_gry_75th': np.percentile(gyr_mag, 75),
         # 'acc_gry_25th': np.percentile(gyr_mag, 25),
