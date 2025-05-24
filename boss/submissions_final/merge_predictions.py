@@ -25,7 +25,7 @@ def main():
     predictions_files_info = [
         {
             # Level
-            "path": 'boss/submissions_final/0521_153128/levels_predictions.csv',
+            "path": 'boss/submissions_final/only_target/only_levels_0522_162954.csv',
             "columns_to_use": None,  # None means use all columns except unique_id
             "id_col": "unique_id"
         },
@@ -37,13 +37,13 @@ def main():
         },
         {
             # Play years
-            "path": 'boss/submissions_final/only_target/only_play_years_0522_131944.csv',
+            "path": 'boss/submissions_final/only_target/only_play_years_0522_122626.csv',
             "columns_to_use": ['play years_0', 'play years_1', 'play years_2'],
             "id_col": "unique_id"
         },
         {
             # Gender
-            "path": 'Pipeline_reconstruction/outputs/submissions/submission_20250521_162003.csv', # Relative to PINGPONG
+            "path": 'Pipeline_reconstruction/outputs/submissions/submission_20250521_144623.csv', # Relative to PINGPONG
             "columns_to_use": ['gender'],  # Only use 'gender' column from this file
             "id_col": "unique_id"
         }
