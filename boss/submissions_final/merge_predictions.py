@@ -26,8 +26,8 @@ def main():
         {
             # Level
             # "path": 'boss/submissions_final/only_target/only_levels_0522_140101.csv', # L1
-            # "path": 'boss/submissions_final/only_target/only_levels_0522_162954.csv', # L7
-            "path": 'boss/submissions_final/only_target/only_levels_0523_113629.csv', # L8
+            "path": 'boss/submissions_final/only_target/only_levels_0522_162954.csv', # L7
+            # "path": 'boss/submissions_final/only_target/only_levels_0523_113629.csv', # L8
             "columns_to_use": None,  # None means use all columns except unique_id
             "id_col": "unique_id"
         },
@@ -40,8 +40,8 @@ def main():
         {
             # Play years
             # "path": 'boss/submissions_final/only_target/only_play_years_0521_175053.csv', # P1
-            # "path": 'boss/submissions_final/only_target/only_play_years_0522_122626.csv', # P2
-            "path": 'boss/submissions_final/only_target/only_play_years_0522_131944.csv', # P5
+            "path": 'boss/submissions_final/only_target/only_play_years_0522_122626.csv', # P2
+            # "path": 'boss/submissions_final/only_target/only_play_years_0522_131944.csv', # P5
 
             "columns_to_use": ['play years_0', 'play years_1', 'play years_2'],
             "id_col": "unique_id"
@@ -49,8 +49,8 @@ def main():
         {
             # Gender
             # "path": 'Pipeline_reconstruction/outputs/submissions/submission_20250521_144623.csv', # G1
-            "path": 'Pipeline_reconstruction/outputs/submissions/submission_20250521_160424.csv', # G2
-            # "path": 'Pipeline_reconstruction/outputs/submissions/submission_20250521_162003.csv', # G3
+            # "path": 'Pipeline_reconstruction/outputs/submissions/submission_20250521_160424.csv', # G2
+            "path": 'Pipeline_reconstruction/outputs/submissions/submission_20250521_162003.csv', # G3
 
             "columns_to_use": ['gender'],  # Only use 'gender' column from this file
             "id_col": "unique_id"
