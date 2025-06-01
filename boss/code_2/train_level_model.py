@@ -30,6 +30,17 @@ def load_raw_data(file_path):
     data = np.array(data)
     return data
 
+def _filter_features_by_model(features, model_name):
+    if model_name == "svm_standard":
+        FILTER_KEY = []
+    elif model_name == 'svm_robust':
+        FILTER_KEY = []
+    elif model_name == 'svm_minmax':
+        FILTER_KEY = []
+    else:
+        FILTER_KEY = []
+
+    return features.drop(columns=FILTER_KEY, errors='ignore') # {i:features[i] for i in features if i not in FILTER_KEY}
 
 def calculate_peak_features(acc_mag):
     """Calculate features related to peaks in the acceleration magnitude."""
@@ -149,9 +160,9 @@ def extract_features(data):
         'x_mean': np.mean(np.abs(ax)),
         'y_mean': np.mean(np.abs(ay)),
         'z_mean': np.mean(np.abs(az)),
-        'ax_rms': np.sqrt(np.mean(ax ** 2)),
-        'ay_rms': np.sqrt(np.mean(ay ** 2)),
-        'az_rms': np.sqrt(np.mean(az ** 2)),
+        # 'ax_rms': np.sqrt(np.mean(ax ** 2)),
+        # 'ay_rms': np.sqrt(np.mean(ay ** 2)),
+        # 'az_rms': np.sqrt(np.mean(az ** 2)),
 
         # 'x_gyr_std': np.std(gx),
         # 'y_gyr_std': np.std(gy),
@@ -348,10 +359,43 @@ def get_model(model_name, random_state=42):
             random_seed=random_state,
             verbose=False
         )
-    elif model_name == 'svm':
+    elif model_name == 'svm': # 'svm_robust', 'svm_minmax', 'svm_standard'
         # 以 Pipeline 包裝標準化與 SVM
         return Pipeline([
             ('scaler', RobustScaler()),
+            ('svm', SVC(
+                probability=True,
+                kernel='rbf',
+                C=1,
+                random_state=random_state
+            ))
+        ])
+    elif model_name == 'svm_robust': # 'svm_robust', 'svm_minmax', 'svm_standard'
+        # 以 Pipeline 包裝標準化與 SVM
+        return Pipeline([
+            ('scaler', RobustScaler()),
+            ('svm', SVC(
+                probability=True,
+                kernel='rbf',
+                C=1,
+                random_state=random_state
+            ))
+        ])
+    elif model_name == 'svm_minmax': # 'svm_robust', 'svm_minmax', 'svm_standard'
+        # 以 Pipeline 包裝標準化與 SVM
+        return Pipeline([
+            ('scaler', MinMaxScaler()),
+            ('svm', SVC(
+                probability=True,
+                kernel='rbf',
+                C=1,
+                random_state=random_state
+            ))
+        ])
+    elif model_name == 'svm_standard': # 'svm_robust', 'svm_minmax', 'svm_standard'
+        # 以 Pipeline 包裝標準化與 SVM
+        return Pipeline([
+            ('scaler', StandardScaler()),
             ('svm', SVC(
                 probability=True,
                 kernel='rbf',
@@ -427,7 +471,22 @@ def get_feature_importance(model, feature_names):
         return np.zeros(len(feature_names))
 
 
-def train_and_predict_for_mode(mode_filter, model_name, eval_mode=True, model_type='random_forest'):
+def train_and_collect(model_names, X_train, y_train):
+    """
+    對每個 model_names 依序 train，再把 predict_proba 堆疊回傳
+    回傳形狀 (n_models, n_samples, n_classes)
+    """
+    trained_model = {}
+    for name in model_names:
+        training_features = _filter_features_by_model(X_train, name)
+        model = get_model(name)
+        print(f"training_features shape for ensemble mode: {training_features.shape}")
+        model.fit(training_features, y_train)
+        trained_model[name] = model
+    return trained_model
+
+
+def train_and_predict_for_mode(mode_filter, model_name, eval_mode=True, model_names=['random_forest']):
     """Train model and make predictions for specific mode(s)
 
     Args:
@@ -459,27 +518,57 @@ def train_and_predict_for_mode(mode_filter, model_name, eval_mode=True, model_ty
         X_train, y_train = X_train_full, y_train_full
         X_val, y_val = None, None
 
-    # Get and train model
-    print(f"Training {model_type} model for {model_name}...")
-    model = get_model(model_type)
-    print("X_train shape: ", X_train.shape)
+    if len(model_names) == 1:
+        # Get and train model
+        print(f"Training model for {model_name}...")
+        training_features = _filter_features_by_model(X_train, model_names[0])
+        print(f"Training features shape for one model mode: {training_features.shape}")
+        model = get_model(model_names[0])
+        model.fit(training_features, y_train)
 
-    model.fit(X_train, y_train)
+        # Calculate validation score if in eval mode
+        val_auc = None
+        if eval_mode:
+            eval_features = _filter_features_by_model(X_val, model_names[0])
+            val_probs = model.predict_proba(eval_features)
+            val_auc = roc_auc_score(y_val, val_probs, multi_class='ovr', average='micro')
+            print(f"\nValidation Micro-averaged One-vs-Rest ROC AUC for {model_name}: {val_auc:.4f}")
 
-    # Calculate validation score if in eval mode
-    val_auc = None
-    if eval_mode:
-        val_probs = model.predict_proba(X_val)
-        val_auc = roc_auc_score(y_val, val_probs, multi_class='ovr', average='micro')
-        print(f"\nValidation Micro-averaged One-vs-Rest ROC AUC for {model_name}: {val_auc:.4f}")
+        # Process test data
+        print(f"Processing test data for {model_name}...")
+        X_test, file_ids = process_test_data(test_data_dir, test_info_path, mode_filter)
+        testing_features = _filter_features_by_model(X_test, model_names[0])
 
-    # Process test data
-    print(f"Processing test data for {model_name}...")
-    X_test, file_ids = process_test_data(test_data_dir, test_info_path, mode_filter)
+        # Make probability predictions
+        print(f"Making predictions for {model_name}...")
+        probabilities = model.predict_proba(testing_features)
+    else:
+        # Process test data
+        print(f"Processing test data for {model_name}...")
+        X_test, file_ids = process_test_data(test_data_dir, test_info_path, mode_filter)
 
-    # Make probability predictions
-    print(f"Making predictions for {model_name}...")
-    probabilities = model.predict_proba(X_test)
+        trained_models = train_and_collect(model_names, X_train, y_train)
+        val_auc = None
+        val_probs_list = []
+        test_probs_list = []
+
+        for model_name in trained_models:
+            model = trained_models[model_name]
+            if eval_mode:
+                eval_features = _filter_features_by_model(X_val, model_name)
+                val_probs = model.predict_proba(eval_features)
+                val_probs_list.append(val_probs)
+            testing_features = _filter_features_by_model(X_test, model_name)
+            print(f"Testing features shape for {model_name}: {testing_features.shape}")
+            probabilities = model.predict_proba(testing_features)
+            test_probs_list.append(probabilities)
+        if eval_mode:
+            val_stack = np.stack(val_probs_list, axis=0)
+            avg_val = np.mean(val_stack, axis=0)
+            val_auc = roc_auc_score(y_val, avg_val, multi_class='ovr', average='micro')
+            print(f"Ensemble Validation AUC ({','.join(model_names)}): {val_auc:.4f}")
+        test_stack = np.stack(test_probs_list, axis=0)
+        probabilities = np.mean(test_stack, axis=0)
 
     # Create predictions DataFrame
     results_df = pd.DataFrame({
@@ -519,7 +608,7 @@ def train_and_predict_for_mode(mode_filter, model_name, eval_mode=True, model_ty
     return results_df, val_auc
 
 
-def combine_predictions(eval_mode=True, model_type='random_forest'):
+def combine_predictions(eval_mode=True, model_list=['random_forest']):
     """Combine predictions from all models into a single file
 
     Args:
@@ -528,10 +617,10 @@ def combine_predictions(eval_mode=True, model_type='random_forest'):
     """
     # Train and predict for each mode group
     print("Processing mode 0-8...")
-    pred_0_8, val_auc_0_8 = train_and_predict_for_mode(list(range(9)), "mode_0_8", eval_mode, model_type)
+    pred_0_8, val_auc_0_8 = train_and_predict_for_mode(list(range(9)), "mode_0_8", eval_mode, model_list)
 
     print("\nProcessing mode 9...")
-    pred_9, val_auc_9 = train_and_predict_for_mode(list(range(9, 11)), "mode_9", eval_mode, model_type)
+    pred_9, val_auc_9 = train_and_predict_for_mode(list(range(9, 11)), "mode_9", eval_mode, model_list)
 
     # print("\nProcessing mode 10...")
     # pred_10, val_auc_10 = train_and_predict_for_mode(10, "mode_10", eval_mode, model_type)
@@ -558,20 +647,21 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Train and predict play years')
     parser.add_argument('--mode', type=str, choices=['all', 'eval'], default='eval',
                         help='Mode to run in: "all" for no evaluation split, "eval" for 80/20 split')
-    parser.add_argument('--model', type=str,
-                        choices=['random_forest', 'xgboost', 'lightgbm', 'catboost', 'stacking', 'svm'],
-                        default='random_forest',
+    parser.add_argument('--model', type=str, nargs='+',
+                        choices=['random_forest', 'xgboost', 'lightgbm', 'catboost', 'stacking', 'svm',
+                                 'svm_robust', 'svm_minmax', 'svm_standard'],
+                        default=['random_forest'],
                         help='Model to use: random_forest, xgboost, lightgbm, catboost, or stacking')
     args = parser.parse_args()
 
     eval_mode = args.mode == 'eval'
-    combine_predictions(eval_mode=eval_mode, model_type=args.model)
+    model_list = args.model
+    combine_predictions(eval_mode=eval_mode, model_list=model_list)
     # python train_level_model.py --model svm --mode all
 
     # tbrain -> single -> baseline
     # 0.58412221 -> 0.83648884
 
-
 """
-/opt/anaconda3/envs/aicup/bin/python /Users/charlie/MBP16/Master_Data/AICUP/PINGPONG/boss/code/boss_level.py --model svm --mode all
+/opt/anaconda3/envs/aicup/bin/python /Users/charlie/MBP16/Master_Data/AICUP/PINGPONG/boss/code_2/train_level_model.py  --model svm --mode all
 """

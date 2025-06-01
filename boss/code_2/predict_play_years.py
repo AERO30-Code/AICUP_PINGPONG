@@ -14,7 +14,6 @@ from sklearn.preprocessing import MinMaxScaler, RobustScaler, Normalizer, Standa
 from sklearn.svm import SVC, LinearSVC
 from sklearn.pipeline import Pipeline
 import matplotlib.pyplot as plt
-from scipy.signal import welch
 
 
 def load_raw_data(file_path):
@@ -60,71 +59,11 @@ def calculate_peak_features(acc_mag):
         'iqr_peak_height': 0
     }
 
-def spectral_entropy(x, fs=85, nperseg=None):
-    # x: 一維時序信號；fs: 取樣頻率
-    f, Pxx = welch(x, fs=fs, nperseg=nperseg or len(x)//2)
-    P = Pxx / np.sum(Pxx)           # 正規化
-    P = P[P>0]                      # 去掉 0 項，避免 log(0)
-    return -np.sum(P * np.log(P))   # 熵
-
-def extract_swing_features(data, n_swings=27, fs=85):
-    """把一筆含有 27 swings 的 data 分成 27 段，各自跑 extract_features，最後把 key 改名拼在一起。"""
-    N = data.shape[0]
-    window = N // n_swings
-    all_feats = {}
-    for i in range(n_swings):
-        seg = data[i*window:(i+1)*window, :]
-        seg_ax, seg_ay, seg_az = seg[:, 0], seg[:, 1], seg[:, 2]
-        seg_acc_mag = np.sqrt(seg_ax ** 2 + seg_ay ** 2 + seg_az ** 2)
-        feats = {
-            # f'max_acc_{i}': np.max(seg_acc_mag),
-            # f'mean_acc_{i}': np.mean(seg_acc_mag),
-            # f'std_acc_{i}': np.std(seg_acc_mag),
-
-            # Axis-specific features
-            f'x_std_{i}': np.std(seg_ax),
-            f'y_std_{i}': np.std(seg_ay),
-            f'z_std_{i}': np.std(seg_az),
-            f'x_mean_{i}': np.mean(np.abs(seg_ax)),
-            f'y_mean_{i}': np.mean(np.abs(seg_ay)),
-            f'z_mean_{i}': np.mean(np.abs(seg_az)),
-
-            # Percentile features
-            # f'acc_75th_{i}': np.percentile(seg_acc_mag, 75),
-            # f'acc_25th_{i}': np.percentile(seg_acc_mag, 25),
-
-            # Statistical features
-            f'acc_skew_{i}': stats.skew(seg_acc_mag),
-            f'acc_kurtosis_{i}': stats.kurtosis(seg_acc_mag),
-            f'acc_rms_{i}': np.sqrt(np.mean(seg_acc_mag ** 2)),
-            f'acc_iqr_{i}': np.percentile(seg_acc_mag, 75) - np.percentile(seg_acc_mag, 25),
-
-            # Axis-specific statistical features
-            f'x_skew_{i}': stats.skew(seg_ax),
-            f'y_skew_{i}': stats.skew(seg_ay),
-            f'z_skew_{i}': stats.skew(seg_az),
-            f'x_kurtosis_{i}': stats.kurtosis(seg_ax),
-            f'y_kurtosis_{i}': stats.kurtosis(seg_ay),
-            f'z_kurtosis_{i}': stats.kurtosis(seg_az),
-
-            # Correlation features
-            # f'xy_corr_{i}': np.corrcoef(seg_ax, seg_ay)[0, 1],
-            # f'xz_corr_{i}': np.corrcoef(seg_ax, seg_az)[0, 1],
-            # f'yz_corr_{i}': np.corrcoef(seg_ay, seg_az)[0, 1],
-        }
-        all_feats = {**all_feats, **feats}
-
-    return all_feats
 
 def extract_features(data):
     """Extract significant features from the raw data."""
-    if 1:
-        swing_features = extract_swing_features(data)
-    else:
-        swing_features = {}
     # Calculate acceleration for each axis
-    filtered_index = int(data.shape[0] * 0.1)
-    ax, ay, az = data[filtered_index:-filtered_index, 0], data[filtered_index:-filtered_index, 1], data[filtered_index:-filtered_index, 2]
+    ax, ay, az = data[:, 0], data[:, 1], data[:, 2]
     gx, gy, gz = data[:, 3], data[:, 4], data[:, 5]
 
     # Calculate acceleration magnitude
@@ -146,12 +85,15 @@ def extract_features(data):
         'x_std': np.std(ax),
         'y_std': np.std(ay),
         'z_std': np.std(az),
-        'x_mean': np.mean(np.abs(ax)),
-        'y_mean': np.mean(np.abs(ay)),
-        'z_mean': np.mean(np.abs(az)),
-        'ax_rms': np.sqrt(np.mean(ax ** 2)),
-        'ay_rms': np.sqrt(np.mean(ay ** 2)),
-        'az_rms': np.sqrt(np.mean(az ** 2)),
+        # 'x_mean': np.mean(np.abs(ax)),
+        # 'y_mean': np.mean(np.abs(ay)),
+        # 'z_mean': np.mean(np.abs(az)),
+        'x_mean': np.mean(ax),
+        'y_mean': np.mean(ay),
+        'z_mean': np.mean(az),
+        # 'x_median': np.median(ax),
+        # 'y_median': np.median(ay),
+        # 'z_median': np.median(az),
 
         # 'x_gyr_std': np.std(gx),
         # 'y_gyr_std': np.std(gy),
@@ -172,12 +114,6 @@ def extract_features(data):
         # Percentile features
         'acc_75th': np.percentile(acc_mag, 75),
         'acc_25th': np.percentile(acc_mag, 25),
-        # 'acc_75th_ax': np.percentile(ax, 75),
-        # 'acc_25th_ax': np.percentile(ax, 25),
-        # 'acc_75th_ay': np.percentile(ay, 75),
-        # 'acc_25th_ay': np.percentile(ay, 25),
-        # 'acc_75th_az': np.percentile(az, 75),
-        # 'acc_25th_az': np.percentile(az, 25),
 
         # 'acc_gry_75th': np.percentile(gyr_mag, 75),
         # 'acc_gry_25th': np.percentile(gyr_mag, 25),
@@ -233,17 +169,16 @@ def extract_features(data):
         mask = (freqs >= low) & (freqs < high)
         features[f'fft_acc_{low}_{high}'] = np.sum(fft_vals[mask]) / total
     # features['acc_dom_freq'] = freqs[np.argmax(fft_vals)]
-    # features['acc_spec_entropy'] = spectral_entropy(acc_mag, fs=85)
 
     # Add peak acceleration features
-    # peak_features = calculate_peak_features(acc_mag)
-    # features.update(peak_features)
+    peak_features = calculate_peak_features(acc_mag)
+    features.update(peak_features)
 
     # Add peak angle acceleration features
     # gyr_peak = calculate_peak_features(gyr_mag)
     # for k, v in gyr_peak.items():
     #     features[f'gyr_{k}'] = v
-    features = {**features, **swing_features}
+
     return features
 
 
@@ -260,7 +195,7 @@ def process_training_data(train_data_dir, train_info_path, mode_filter):
 
     # Process each training file
     features_list = []
-    level_list = []
+    play_years_list = []
 
     for _, row in mode_info.iterrows():
         file_path = os.path.join(train_data_dir, f"{row['unique_id']}.txt")
@@ -269,11 +204,11 @@ def process_training_data(train_data_dir, train_info_path, mode_filter):
             data = load_raw_data(file_path)
             features = extract_features(data)
             features_list.append(features)
-            level_list.append(row['level'])
+            play_years_list.append(row['play years'])
 
     # Convert to DataFrame
     X_train = pd.DataFrame(features_list)
-    y_train = np.array(level_list)
+    y_train = np.array(play_years_list)
 
     return X_train, y_train
 
@@ -462,8 +397,6 @@ def train_and_predict_for_mode(mode_filter, model_name, eval_mode=True, model_ty
     # Get and train model
     print(f"Training {model_type} model for {model_name}...")
     model = get_model(model_type)
-    print("X_train shape: ", X_train.shape)
-
     model.fit(X_train, y_train)
 
     # Calculate validation score if in eval mode
@@ -484,10 +417,9 @@ def train_and_predict_for_mode(mode_filter, model_name, eval_mode=True, model_ty
     # Create predictions DataFrame
     results_df = pd.DataFrame({
         'unique_id': file_ids,
-        'level_2': probabilities[:, 0],
-        'level_3': probabilities[:, 1],
-        'level_4': probabilities[:, 2],
-        'level_5': probabilities[:, 3]
+        'play years_0': probabilities[:, 0],
+        'play years_1': probabilities[:, 1],
+        'play years_2': probabilities[:, 2]
     })
 
     # Sort by unique_id
@@ -531,25 +463,25 @@ def combine_predictions(eval_mode=True, model_type='random_forest'):
     pred_0_8, val_auc_0_8 = train_and_predict_for_mode(list(range(9)), "mode_0_8", eval_mode, model_type)
 
     print("\nProcessing mode 9...")
-    pred_9, val_auc_9 = train_and_predict_for_mode(list(range(9, 11)), "mode_9", eval_mode, model_type)
+    pred_9, val_auc_9 = train_and_predict_for_mode(9, "mode_9", eval_mode, model_type)
 
-    # print("\nProcessing mode 10...")
-    # pred_10, val_auc_10 = train_and_predict_for_mode(10, "mode_10", eval_mode, model_type)
+    print("\nProcessing mode 10...")
+    pred_10, val_auc_10 = train_and_predict_for_mode(10, "mode_10", eval_mode, model_type)
 
     # Print overall validation scores if in eval mode
-    # if eval_mode:
-    #     print("\nOverall Validation Scores:")
-    #     print(f"Mode 0-8: {val_auc_0_8:.4f}")
-    #     print(f"Mode 9: {val_auc_9:.4f}")
-        # print(f"Mode 10: {val_auc_10:.4f}")
-        # print(f"Average: {(val_auc_0_8 + val_auc_9 + val_auc_10) / 3:.4f}")
+    if eval_mode:
+        print("\nOverall Validation Scores:")
+        print(f"Mode 0-8: {val_auc_0_8:.4f}")
+        print(f"Mode 9: {val_auc_9:.4f}")
+        print(f"Mode 10: {val_auc_10:.4f}")
+        print(f"Average: {(val_auc_0_8 + val_auc_9 + val_auc_10) / 3:.4f}")
 
     # Combine all predictions
-    all_predictions = pd.concat([pred_0_8, pred_9]) # , pred_10
+    all_predictions = pd.concat([pred_0_8, pred_9, pred_10])
     all_predictions = all_predictions.sort_values('unique_id')
 
     # Save combined predictions
-    output_path = 'boss/submissions_final/levels_predictions.csv'
+    output_path = 'boss/submissions_final/play_years_predictions.csv'
     all_predictions.to_csv(output_path, index=False)
     print(f"\nCombined predictions saved to {output_path}")
 
@@ -566,12 +498,71 @@ if __name__ == "__main__":
 
     eval_mode = args.mode == 'eval'
     combine_predictions(eval_mode=eval_mode, model_type=args.model)
-    # python train_level_model.py --model svm --mode all
 
-    # tbrain -> single -> baseline
-    # 0.58412221 -> 0.83648884
+    # Using xgboost
+    # 80/20
+    # Overall Validation Scores:
+    # Mode 0-8: 0.9377
+    # Mode 9: 0.9982
+    # Mode 10: 0.9854
+    # Average: 0.9738
+
+    # all
+    # 0.55271058 (random + pred play years)
+
+    # Using random_forest
+    # 80/20
+    # Overall Validation Scores:
+    # Mode 0-8: 0.9451
+    # Mode 9: 0.9951
+    # Mode 10: 0.9883
+    # Average: 0.9762
+    #
+
+    # all
+    # 0.55386613 (random + pred play years)
+    # 0.55529738 (from last 80 % data)
+
+    # Using svm
+    # 0.55999280
+
+    # Using lightgbm
+    # 80/20
+    # Overall Validation Scores:
+    # Mode 0-8: 0.9426
+    # Mode 9: 0.9986
+    # Mode 10: 0.9886
+    # Average: 0.9766
+
+    # all   / 80/20
+    # 0.5500/ 0.5517
+
+    # Using catboost
+    # 80/20
+    # Overall Validation Scores:
+    # Mode 0-8: 0.9632
+    # Mode 9: 0.9934
+    # Mode 10: 0.9771
+    # Average: 0.9779
+
+    # all
+    # 0.5507
+
+    # Using stacking
+    # 80/20
+    # Overall Validation Scores:
+    # Mode 0-8: 0.9339
+    # Mode 9: 0.9992
+    # Mode 10: 0.9845
+    # Average: 0.9726
+
+    # all
+    # 0.53832828
+
+    # score + 0.2853137 = best
+    # (score - 0.375) * 4 = this spec score
 
 
 """
-/opt/anaconda3/envs/aicup/bin/python /Users/charlie/MBP16/Master_Data/AICUP/PINGPONG/boss/code/boss_level.py --model svm --mode all
+/opt/anaconda3/envs/aicup/bin/python /Users/charlie/MBP16/Master_Data/AICUP/PINGPONG/boss/code_2/predict_play_years.py  --model svm --mode all
 """

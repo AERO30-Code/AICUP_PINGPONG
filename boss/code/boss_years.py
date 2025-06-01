@@ -77,9 +77,9 @@ def extract_features(data):
         'mean_acc': np.mean(acc_mag),
         'std_acc': np.std(acc_mag),
 
-        'max_gyr_acc': np.max(gyr_mag),
-        'mean_gyr_acc': np.mean(gyr_mag),
-        'std_gyr_acc': np.std(gyr_mag),
+        # 'max_gyr_acc': np.max(gyr_mag),
+        # 'mean_gyr_acc': np.mean(gyr_mag),
+        # 'std_gyr_acc': np.std(gyr_mag),
 
         # Axis-specific features
         'x_std': np.std(ax),
@@ -148,12 +148,12 @@ def extract_features(data):
         # 'yz_gry_corr': np.corrcoef(gy, gz)[0, 1]
     }
     dt = 1/85.0
-    jerk = np.diff(acc_mag)/dt
-    features.update({
-                    'mean_jerk': np.mean(jerk),
-                    'std_jerk': np.std(jerk),
-                    'max_jerk': np.max(jerk)
-    })
+    # jerk = np.diff(acc_mag)/dt
+    # features.update({
+    #                 'mean_jerk': np.mean(jerk),
+    #                 'std_jerk': np.std(jerk),
+    #                 'max_jerk': np.max(jerk)
+    # })
 
     # spectral features
     fft_vals = np.abs(np.fft.rfft(acc_mag)) ** 2
