@@ -28,7 +28,8 @@ def main():
             # "path": 'boss/submissions_final/only_target/only_levels_0522_140101.csv', # L1
             # "path": 'boss/submissions_final/only_target/only_levels_0522_162954.csv', # L7
             # "path": 'boss/submissions_final/only_target/only_levels_0523_113629.csv', # L8
-            "path": 'boss/submissions_final/only_target/only_levels_0601_233801.csv', # L14
+            # "path": 'boss/submissions_final/only_target/only_levels_0601_233801.csv', # L14
+            "path": 'boss/submissions_final/only_target/only_levels_0602_142248.csv', # L16
             "columns_to_use": None,  # None means use all columns except unique_id
             "id_col": "unique_id"
         },
@@ -43,8 +44,9 @@ def main():
             # "path": 'boss/submissions_final/only_target/only_play_years_0521_175053.csv', # P1
             # "path": 'boss/submissions_final/only_target/only_play_years_0522_122626.csv', # P2
             # "path": 'boss/submissions_final/only_target/only_play_years_0522_131944.csv', # P5
-            "path": 'boss/submissions_final/only_target/only_play_years_0601_225025.csv', # P6
-
+            # "path": 'boss/submissions_final/only_target/only_play_years_0601_225025.csv', # P6
+            "path": 'boss/submissions_final/only_target/only_play_years_0602_123404.csv', # P16
+            # "path": 'boss/submissions_final/only_target/only_play_years_0602_143311.csv', # P18
             "columns_to_use": ['play years_0', 'play years_1', 'play years_2'],
             "id_col": "unique_id"
         },

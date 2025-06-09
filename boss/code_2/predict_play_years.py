@@ -101,6 +101,9 @@ def extract_features(data):
         # 'x_gyr_mean': np.mean(np.abs(gx)),
         # 'y_gyr_mean': np.mean(np.abs(gy)),
         # 'z_gyr_mean': np.mean(np.abs(gz)),
+        # 'x_gyr_mean': np.mean(gx),
+        # 'y_gyr_mean': np.mean(gy),
+        # 'z_gyr_mean': np.mean(gz),
 
         # Range features
         # 'x_range': np.max(ax) - np.min(ax),
@@ -154,12 +157,12 @@ def extract_features(data):
         # 'yz_gry_corr': np.corrcoef(gy, gz)[0, 1]
     }
     dt = 1/85.0
-    # jerk = np.diff(acc_mag)/dt
-    # features.update({
-    #                 'mean_jerk': np.mean(jerk),
-    #                 'std_jerk': np.std(jerk),
-    #                 'max_jerk': np.max(jerk)
-    # })
+    jerk = np.diff(acc_mag)/dt
+    features.update({
+                    'mean_jerk': np.mean(jerk),
+                    'std_jerk': np.std(jerk),
+                    'max_jerk': np.max(jerk)
+    })
 
     # spectral features
     fft_vals = np.abs(np.fft.rfft(acc_mag)) ** 2
@@ -168,6 +171,20 @@ def extract_features(data):
     for low, high in [(0, 5), (5, 15), (15, 30)]:
         mask = (freqs >= low) & (freqs < high)
         features[f'fft_acc_{low}_{high}'] = np.sum(fft_vals[mask]) / total
+
+    # spectral features new
+    # fft_vals = np.abs(np.fft.rfft(acc_mag)) ** 2
+    # freqs = np.fft.rfftfreq(len(acc_mag), d=dt)
+    # total_energy = np.sum(fft_vals) # It's good practice to use total_energy if it's non-zero
+
+    # if total_energy > 0: # Avoid division by zero if signal is flat
+    #     for low, high in [(0, 5), (5, 15), (15, 30)]:
+    #         band_energy = np.sum(fft_vals[(freqs >= low) & (freqs < high)])
+    #         features[f'energy_{low}_{high}Hz_ratio'] = band_energy / total_energy
+    # else:
+    #     for low, high in [(0, 5), (5, 15), (15, 30)]:
+    #         features[f'energy_{low}_{high}Hz_ratio'] = 0
+
     # features['acc_dom_freq'] = freqs[np.argmax(fft_vals)]
 
     # Add peak acceleration features
@@ -291,6 +308,7 @@ def get_model(model_name, random_state=42):
                 probability=True,
                 kernel='rbf',
                 C=1,
+                gamma='scale',
                 random_state=random_state
             ))
         ])
@@ -565,4 +583,5 @@ if __name__ == "__main__":
 
 """
 /opt/anaconda3/envs/aicup/bin/python /Users/charlie/MBP16/Master_Data/AICUP/PINGPONG/boss/code_2/predict_play_years.py  --model svm --mode all
+/opt/anaconda3/envs/aicup/bin/python /Users/charlie/MBP16/Master_Data/AICUP/PINGPONG/boss/code_2/predict_play_years.py  --model svm --mode eval
 """

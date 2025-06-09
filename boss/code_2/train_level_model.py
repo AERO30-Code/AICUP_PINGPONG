@@ -664,4 +664,6 @@ if __name__ == "__main__":
 
 """
 /opt/anaconda3/envs/aicup/bin/python /Users/charlie/MBP16/Master_Data/AICUP/PINGPONG/boss/code_2/train_level_model.py  --model svm --mode all
+/opt/anaconda3/envs/aicup/bin/python /Users/charlie/MBP16/Master_Data/AICUP/PINGPONG/boss/code_2/train_level_model.py  --model svm_robust svm_standard  --mode all
+/opt/anaconda3/envs/aicup/bin/python /Users/charlie/MBP16/Master_Data/AICUP/PINGPONG/boss/code_2/train_level_model.py  --model svm_robust svm_standard  --mode eval
 """
